@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Meta Preview</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      font-size: 2rem;
+    }
+
+    #stage { padding: 2rem; }
+
+    .atom { font-weight: 600; }
+
+    .molecule {
+      display: flex;
+      gap: 0.4em;
+      align-items: baseline;
+    }
+
+    .molecule em {
+      font-style: normal;
+      color: #e94560;
+    }
+
+    #status {
+      position: fixed;
+      top: 8px;
+      right: 12px;
+      font-size: 11px;
+      font-family: monospace;
+      color: #aaa;
+    }
+
+    #story-label {
+      position: fixed;
+      bottom: 12px;
+      left: 12px;
+      font-size: 11px;
+      font-family: monospace;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <div id="status">connecting…</div>
+  <div id="stage"><span style="color:#ccc">Waiting for story…</span></div>
+  <div id="story-label"></div>
+
+  <script>
+    const stage = document.getElementById('stage');
+    const label = document.getElementById('story-label');
+    const status = document.getElementById('status');
+
+    function connect() {
+      const ws = new WebSocket(`ws://${location.host}`);
+
+      ws.addEventListener('open', () => {
+        ws.send(JSON.stringify({ type: 'register', role: 'meta-preview' }));
+        status.textContent = 'connected';
+      });
+
+      ws.addEventListener('message', ({ data }) => {
+        const msg = JSON.parse(data);
+        if (msg.type === 'story-rendered') {
+          stage.innerHTML = msg.html;
+          label.textContent = `${msg.kind} / ${msg.name}`;
+        }
+      });
+
+      ws.addEventListener('close', () => {
+        status.textContent = 'disconnected — retrying…';
+        setTimeout(connect, 2000);
+      });
+
+      ws.addEventListener('error', () => ws.close());
+    }
+
+    connect();
+  </script>
+</body>
+</html>
