@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `docs/` folder with full reference material for all planned setups and SDKs
+- `docs/README.md` — index of all docs
+- `docs/storybook-setup.md` — project architecture, named-setup convention, relay, storybook-channel, story format
+- `docs/setup-html.md`, `setup-threejs-2d.md`, `setup-threejs-3d.md`, `setup-audio.md`, `setup-openbrush.md`, `setup-bantervr-ui.md`, `setup-bantervr-3d.md` — per-setup reference docs
+- `docs/sdk-threejs.md` — Three.js API reference (Scene, Camera, Geometry, Material, Lights, OrbitControls, serialization)
+- `docs/sdk-tonejs.md` — Tone.js API reference (Transport, Synth, PolySynth, Sequence, effects, visualiser, note format)
+- `docs/sdk-tonaljs.md` — Tonal.js API reference (Note, Chord, Scale, Key, Progression, RomanNumeral)
+- `docs/sdk-openbrush.md` — Open Brush HTTP API reference (commands, story format)
+- `docs/sdk-banter.md` — BanterVR SDK reference (copied from shoseki-tasks)
+
 ## [0.1.3] - 2026-04-20
 
 ### Added
