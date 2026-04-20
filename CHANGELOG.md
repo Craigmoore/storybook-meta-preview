@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.2.0] - 2026-04-20
 
 ### Added
 - `docs/` folder with full reference material for all planned setups and SDKs
