@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.1.3] - 2026-04-20
 
 ### Added
 - `README.md` — project overview, architecture, per-setup run instructions, and guide for adding new setups
