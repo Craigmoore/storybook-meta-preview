@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.1.1] - 2026-04-20
 
 ### Changed
 - Introduced named-setup convention: `.storybook-[name]/`, `src/[name]/`, and `:[name]` script suffixes
