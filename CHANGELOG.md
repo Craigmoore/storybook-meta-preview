@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `CLAUDE.md` — project instructions, architecture overview, named-setup convention, and release process
+
 ## [0.1.1] - 2026-04-20
 
 ### Changed
