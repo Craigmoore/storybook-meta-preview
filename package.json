@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "storybook": "storybook dev -p 6006 --host 0.0.0.0",
-    "build-storybook": "storybook build",
-    "relay": "node src/relay.js",
-    "dev": "concurrently \"yarn relay\" \"yarn storybook\""
+    "storybook:html": "storybook dev -c .storybook-html -p 6006 --host 0.0.0.0",
+    "relay:html": "PORT=3333 node src/relay.js",
+    "dev:html": "concurrently \"yarn relay:html\" \"yarn storybook:html\"",
+    "build:html": "storybook build -c .storybook-html"
   },
   "dependencies": {
     "express": "^4.18.2",

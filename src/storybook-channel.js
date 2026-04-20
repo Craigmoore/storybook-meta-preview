@@ -1,8 +1,10 @@
-// storybook-channel: connects Storybook's preview to the relay server.
-// After each story renders, captures the DOM and sends it to relay,
-// which broadcasts it to any connected meta-preview clients.
+// Shared storybook-channel decorator.
+// Connects Storybook's preview iframe to the relay server and sends rendered
+// HTML after each story render. Each setup injects STORYBOOK_RELAY_PORT via
+// its dev script so this file stays setup-agnostic.
 
-const relay = new WebSocket(`ws://${location.hostname}:3333`);
+const relayPort = process.env.STORYBOOK_RELAY_PORT ?? '3333';
+const relay = new WebSocket(`ws://${location.hostname}:${relayPort}`);
 
 relay.addEventListener('open', () => {
   relay.send(JSON.stringify({ type: 'register', role: 'storybook-channel' }));

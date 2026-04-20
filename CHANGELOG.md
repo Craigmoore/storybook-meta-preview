@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- Introduced named-setup convention: `.storybook-[name]/`, `src/[name]/`, and `:[name]` script suffixes
+- Renamed `.storybook/` → `.storybook-html/` and `src/components/` → `src/html/`
+- Extracted shared `src/storybook-channel.js` — relay port driven by `STORYBOOK_RELAY_PORT` env var so each setup can target its own relay
+- Each setup's `preview.js` is now a one-liner re-export from `storybook-channel.js`
+- Added `setups.js` — single registry mapping setup name → Storybook port + relay port
+- Scripts renamed to `storybook:[name]`, `relay:[name]`, `dev:[name]`
+
 ## [0.1.0] - 2026-04-19
 
 ### Added

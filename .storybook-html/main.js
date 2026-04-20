@@ -1,8 +1,8 @@
 /** @type {import('@storybook/html-webpack5').StorybookConfig} */
 const config = {
   stories: [
-    '../src/components/atoms/**/*.stories.js',
-    '../src/components/molecules/**/*.stories.js',
+    '../src/html/atoms/**/*.stories.js',
+    '../src/html/molecules/**/*.stories.js',
   ],
   addons: ['@storybook/addon-essentials'],
   framework: {
