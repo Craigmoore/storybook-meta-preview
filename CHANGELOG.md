@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.8.0] - 2026-04-21
 
 ### Added
 - Storybook controls added to all openbrush stories:
