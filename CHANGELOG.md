@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.3.0] - 2026-04-21
 
 ### Added
 - `threejs-2d` setup: orthographic Three.js scenes via `@storybook/html-webpack5`
