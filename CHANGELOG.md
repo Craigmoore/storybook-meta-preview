@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.8.2] - 2026-04-21
 
 ### Changed
 - `README.md` — updated openbrush setup with Three.js geometry pipeline, meta-preview button docs, full story list; expanded audio story counts; added organisms layer and all public meta-preview files to project structure
