@@ -47,16 +47,24 @@ function fbm(x, y, octaves = 4) {
 
 // --- Terrain ---
 
-export function terrainHeight(x, z, heightScale = 0.6) {
-  return fbm(x * 0.6 + 3.7, z * 0.6 + 1.3) * heightScale;
+// Converts a seed into a large domain offset so each seed samples a distinct region of Perlin space.
+function terrainDomain(seed) {
+  const rng = makeRng(seed ^ 0x5a5a5a5a);
+  return [rng() * 300, rng() * 300];
 }
 
-export function makeTerrain(size = 6, segments = 19, heightScale = 0.6) {
+export function terrainHeight(x, z, heightScale = 0.6, seed = 1) {
+  const [ox, oz] = terrainDomain(seed);
+  return fbm(x * 0.6 + ox, z * 0.6 + oz) * heightScale;
+}
+
+export function makeTerrain(size = 6, segments = 19, heightScale = 0.6, seed = 1) {
+  const [ox, oz] = terrainDomain(seed);
   const geom = new THREE.PlaneGeometry(size, size, segments, segments);
   geom.rotateX(-Math.PI / 2);
   const pos = geom.attributes.position;
   for (let i = 0; i < pos.count; i++) {
-    pos.setY(i, fbm(pos.getX(i) * 0.6 + 3.7, pos.getZ(i) * 0.6 + 1.3) * heightScale);
+    pos.setY(i, fbm(pos.getX(i) * 0.6 + ox, pos.getZ(i) * 0.6 + oz) * heightScale);
   }
   pos.needsUpdate = true;
   return [TERRAIN, ...edgesFromGeometry(geom, null, 100)];
@@ -103,12 +111,12 @@ function buildRoadBranches(cx, cz, seed, depth = 5) {
   return branches;
 }
 
-function renderRoadBranches(branches) {
+function renderRoadBranches(branches, th = terrainHeight) {
   const cmds = [ROAD];
   for (const wps of branches) {
     const left = [], right = [];
     for (const { x, z, a, width } of wps) {
-      const y = terrainHeight(x, z) + 0.025;
+      const y = th(x, z) + 0.025;
       const ox = -Math.sin(a) * width / 2, oz = Math.cos(a) * width / 2;
       left.push( [x - ox, y, z - oz]);
       right.push([x + ox, y, z + oz]);
@@ -118,8 +126,9 @@ function renderRoadBranches(branches) {
   return cmds;
 }
 
-export function makeRoadNetwork(cx = 0, cz = 0, seed = 1, depth = 5) {
-  return renderRoadBranches(buildRoadBranches(cx, cz, seed, depth));
+export function makeRoadNetwork(cx = 0, cz = 0, roadSeed = 1, depth = 5, terrainSeed = 1) {
+  const th = (x, z) => terrainHeight(x, z, 0.6, terrainSeed);
+  return renderRoadBranches(buildRoadBranches(cx, cz, roadSeed, depth), th);
 }
 
 // --- Placement primitives ---
@@ -138,7 +147,7 @@ export function makeTree(x = 0, y = 0, z = 0) {
   ];
 }
 
-const TREE_HEIGHT  = 1.4;
+export const TREE_HEIGHT = 1.4;
 const HOUSE_SCALE  = 0.38; // houses are 38% the height of a tree
 const HOUSE_SIZE   = TREE_HEIGHT * HOUSE_SCALE; // ~0.53
 
@@ -173,6 +182,7 @@ function tooClose(placed, px, pz, minDist) {
 // --- Scene ---
 
 export function makeScene(seed = 1) {
+  const th      = (x, z) => terrainHeight(x, z, 0.6, seed);
   const branches = buildRoadBranches(0, 0, seed, 5);
 
   const roadSegs = [];
@@ -183,8 +193,8 @@ export function makeScene(seed = 1) {
   const placed = [];
   const cmds   = [];
 
-  cmds.push(...makeTerrain());
-  cmds.push(...renderRoadBranches(branches));
+  cmds.push(...makeTerrain(6, 19, 0.6, seed));
+  cmds.push(...renderRoadBranches(branches, th));
 
   // Houses on both sides of each road branch
   for (const wps of branches) {
@@ -202,7 +212,7 @@ export function makeScene(seed = 1) {
         if (Math.abs(hx) > 2.5 || Math.abs(hz) > 2.5) continue;
         if (nearRoad(roadSegs, hx, hz, HOUSE_SIZE / 2 + 0.15)) continue;
         if (tooClose(placed, hx, hz, HOUSE_SIZE + 0.25)) continue;
-        cmds.push(...makeHouseAt(hx, terrainHeight(hx, hz), hz));
+        cmds.push(...makeHouseAt(hx, th(hx, hz), hz));
         placed.push({ x: hx, z: hz, radius: HOUSE_SIZE / 2 });
         placedHere = true;
       }
@@ -220,7 +230,7 @@ export function makeScene(seed = 1) {
       const tz = zi + (treeRng() - 0.5) * GRID * 0.8;
       if (nearRoad(roadSegs, tx, tz, 0.45)) continue;
       if (tooClose(placed, tx, tz, 1.1)) continue;
-      cmds.push(...makeTree(tx, terrainHeight(tx, tz), tz));
+      cmds.push(...makeTree(tx, th(tx, tz), tz));
       placed.push({ x: tx, z: tz, radius: 0.5 });
     }
   }
@@ -233,7 +243,7 @@ export function makeScene(seed = 1) {
     const rs = 0.18 + rockRng() * 0.25;
     if (nearRoad(roadSegs, rx, rz, 0.4)) continue;
     if (tooClose(placed, rx, rz, rs + 0.6)) continue;
-    cmds.push(...makeRock(rx, terrainHeight(rx, rz), rz, rs));
+    cmds.push(...makeRock(rx, th(rx, rz), rz, rs));
     placed.push({ x: rx, z: rz, radius: rs * 0.8 });
   }
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- Storybook controls added to all openbrush stories:
+  - `Shapes.stories.js` — line endpoints, rect dimensions, polygon radius/sides, circle segments, star inner/outer radius and point count, cross length, brush size on all
+  - `Compositions.stories.js` — nested square count/size, concentric circle count/radius/segments, mandala ring counts and radii, dot grid rows/cols/spacing/radius, interlocking ring count/radius/overlap, snowflake spokes/length/branch count
+  - `Fractals.stories.js` — depth/radius for Sierpinski variants, depth/radius for Koch, iterations/stepSize for Dragon variants, order/size for Hilbert, iterations/scale for Barnsley Fern, brush size on all
+  - `Structures.stories.js` — terrain size/segments/heightScale, road layout seed/terrain seed/depth (independent seeds), rock count/size range, house scale relative to tree height
+  - `Village.stories.js` — scene seed, brush size
+
 ## [0.7.0] - 2026-04-21
 
 ### Added
