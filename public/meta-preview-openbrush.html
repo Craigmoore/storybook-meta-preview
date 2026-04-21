@@ -43,6 +43,12 @@
     }
     button:hover    { background: #e9456015; }
     button:disabled { border-color: #444; color: #444; cursor: default; }
+    .btn-secondary {
+      border-color: #555;
+      color: #777;
+    }
+    .btn-secondary:hover    { background: #55555515; }
+    .btn-secondary:disabled { border-color: #333; color: #444; }
 
     #progress-wrap {
       width: 340px;
@@ -74,6 +80,9 @@
   <div id="controls">
     <input id="host-input" type="text" value="localhost" placeholder="Open Brush host" />
     <button id="btn-send" disabled>send to open brush</button>
+    <button id="btn-save" class="btn-secondary" disabled>save</button>
+    <button id="btn-export" class="btn-secondary" disabled>export</button>
+    <button id="btn-show-exports" class="btn-secondary">show exports</button>
   </div>
 
   <div id="progress-wrap"><div id="progress-bar"></div></div>
@@ -89,11 +98,24 @@
     const label     = document.getElementById('story-label');
     const hostInput = document.getElementById('host-input');
     const btnSend   = document.getElementById('btn-send');
+    const btnSave        = document.getElementById('btn-save');
+    const btnExport      = document.getElementById('btn-export');
+    const btnShowExports = document.getElementById('btn-show-exports');
     const progressBar = document.getElementById('progress-bar');
     const cmdStatus = document.getElementById('cmd-status');
 
     let currentData = null;
     let sending = false;
+
+    function apiBase() {
+      return `http://${hostInput.value.trim() || 'localhost'}:40074/api/v1`;
+    }
+
+    async function sendCmd(cmd) {
+      try {
+        await fetch(`${apiBase()}?${cmd}`, { mode: 'no-cors' });
+      } catch {}
+    }
 
     async function sendToOpenBrush(data) {
       if (sending) return;
@@ -101,16 +123,13 @@
       btnSend.disabled = true;
       progressBar.style.width = '0%';
 
-      const host = hostInput.value.trim() || 'localhost';
-      const base = `http://${host}:40074/api/v1`;
-
+      const base = apiBase();
       const allCmds = ['new', 'brush.move.to=0,1.5,0', ...data.commands];
       let failed = 0;
 
       for (let i = 0; i < allCmds.length; i++) {
-        const cmd = allCmds[i];
         try {
-          await fetch(`${base}?${cmd}`, { mode: 'no-cors' });
+          await fetch(`${base}?${allCmds[i]}`, { mode: 'no-cors' });
         } catch {
           failed++;
         }
@@ -129,6 +148,22 @@
       if (currentData) sendToOpenBrush(currentData);
     });
 
+    btnSave.addEventListener('click', async () => {
+      btnSave.disabled = true;
+      await sendCmd('save.new');
+      cmdStatus.textContent = 'saved';
+      btnSave.disabled = false;
+    });
+
+    btnExport.addEventListener('click', async () => {
+      btnExport.disabled = true;
+      await sendCmd('export.current');
+      cmdStatus.textContent = 'exported';
+      btnExport.disabled = false;
+    });
+
+    btnShowExports.addEventListener('click', () => sendCmd('showfolder.exports'));
+
     function connect() {
       const ws = new WebSocket(`ws://${location.host}`);
 
@@ -143,6 +178,8 @@
         label.textContent = `${msg.kind} / ${msg.name}`;
         currentData = msg.brushData;
         btnSend.disabled = false;
+        btnSave.disabled = false;
+        btnExport.disabled = false;
         cmdStatus.textContent = `${msg.brushData.commands.length} commands ready`;
         progressBar.style.width = '0%';
         sendToOpenBrush(currentData);

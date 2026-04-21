@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `meta-preview-openbrush.html` — save, export, and show exports buttons: `save.new` saves to a new sketch slot, `export.current` exports to the Open Brush Exports folder, `showfolder.exports` opens that folder on the desktop
+
 ## [0.8.0] - 2026-04-21
 
 ### Added
