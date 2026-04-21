@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- Expanded audio stories with richer musical content
+- `Note.stories.js` — 7 stories spanning sub-bass (A1) to stratosphere (C8)
+- `Chord.stories.js` — 14 chords covering triads, sevenths, extended, quartal, cluster, and power chord
+- `Progression.stories.js` — 9 progressions: Pop Loop, Jazz ii–V–I, Andalusian, Pachelbel, 12-bar Blues, Circle of Fifths, Chromatic Rise, Celtic Melody, Dorian Vamp
+
 ## [0.5.0] - 2026-04-21
 
 ### Added
