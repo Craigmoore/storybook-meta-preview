@@ -14,6 +14,7 @@ export const decorators = [
   (StoryFn, context) => {
     window.__metaPreviewScene = null;
     window.__metaPreviewData = null;
+    window.__metaPreviewBrush = null;
     const result = StoryFn();
 
     requestAnimationFrame(() => {
@@ -44,6 +45,18 @@ export const decorators = [
           audioData: window.__metaPreviewData,
         }));
         window.__metaPreviewData = null;
+        return;
+      }
+
+      if (window.__metaPreviewBrush) {
+        relay.send(JSON.stringify({
+          type: 'story-rendered',
+          storyId: context.id,
+          name: context.name,
+          kind: context.kind,
+          brushData: window.__metaPreviewBrush,
+        }));
+        window.__metaPreviewBrush = null;
         return;
       }
 

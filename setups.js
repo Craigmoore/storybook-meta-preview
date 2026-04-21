@@ -13,4 +13,5 @@ export const setups = {
   'threejs-2d': { storybookPort: 6007, relayPort: 3334 },
   'threejs-3d': { storybookPort: 6008, relayPort: 3335 },
   'audio':      { storybookPort: 6009, relayPort: 3336 },
+  'openbrush':  { storybookPort: 6010, relayPort: 3337 },
 };

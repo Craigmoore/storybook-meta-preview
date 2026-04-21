@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Meta Preview — Open Brush</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #1a1a1a;
+      color: #ccc;
+      font-family: monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      gap: 20px;
+    }
+    #status      { position: fixed; top: 8px; right: 12px; font-size: 11px; color: #555; }
+    #story-label { position: fixed; top: 8px; left:  12px; font-size: 11px; color: #555; }
+
+    #controls { display: flex; align-items: center; gap: 10px; }
+    input[type=text] {
+      background: #111;
+      border: 1px solid #333;
+      color: #ccc;
+      font-family: monospace;
+      font-size: 0.85rem;
+      padding: 7px 10px;
+      border-radius: 2px;
+      width: 160px;
+    }
+    input[type=text]:focus { outline: none; border-color: #555; }
+    button {
+      background: none;
+      border: 1px solid #e94560;
+      color: #e94560;
+      font-family: monospace;
+      font-size: 0.85rem;
+      padding: 7px 20px;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+    button:hover    { background: #e9456015; }
+    button:disabled { border-color: #444; color: #444; cursor: default; }
+
+    #progress-wrap {
+      width: 340px;
+      height: 3px;
+      background: #222;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    #progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #e94560;
+      transition: width 0.05s linear;
+    }
+
+    #hint {
+      font-size: 10px;
+      color: #3a3a3a;
+      text-align: center;
+      line-height: 1.6;
+    }
+    #cmd-status { font-size: 11px; color: #555; min-height: 1em; }
+  </style>
+</head>
+<body>
+  <div id="status">connecting…</div>
+  <div id="story-label"></div>
+
+  <div id="controls">
+    <input id="host-input" type="text" value="localhost" placeholder="Open Brush host" />
+    <button id="btn-send" disabled>send to open brush</button>
+  </div>
+
+  <div id="progress-wrap"><div id="progress-bar"></div></div>
+  <div id="cmd-status">waiting for story…</div>
+
+  <div id="hint">
+    Open Brush must be running with <code>--EnableApiRemoteCalls</code><br>
+    Each story auto-sends on select. Use the button to re-send.
+  </div>
+
+  <script type="module">
+    const status    = document.getElementById('status');
+    const label     = document.getElementById('story-label');
+    const hostInput = document.getElementById('host-input');
+    const btnSend   = document.getElementById('btn-send');
+    const progressBar = document.getElementById('progress-bar');
+    const cmdStatus = document.getElementById('cmd-status');
+
+    let currentData = null;
+    let sending = false;
+
+    async function sendToOpenBrush(data) {
+      if (sending) return;
+      sending = true;
+      btnSend.disabled = true;
+      progressBar.style.width = '0%';
+
+      const host = hostInput.value.trim() || 'localhost';
+      const base = `http://${host}:40074/api/v1`;
+
+      const allCmds = ['new', 'brush.move.to=0,1.5,0', ...data.commands];
+      let failed = 0;
+
+      for (let i = 0; i < allCmds.length; i++) {
+        const cmd = allCmds[i];
+        try {
+          await fetch(`${base}?${cmd}`, { mode: 'no-cors' });
+        } catch {
+          failed++;
+        }
+        progressBar.style.width = `${((i + 1) / allCmds.length) * 100}%`;
+      }
+
+      cmdStatus.textContent = failed
+        ? `${allCmds.length - failed}/${allCmds.length} commands sent (${failed} failed — is Open Brush running?)`
+        : `${allCmds.length} commands sent`;
+
+      sending = false;
+      btnSend.disabled = false;
+    }
+
+    btnSend.addEventListener('click', () => {
+      if (currentData) sendToOpenBrush(currentData);
+    });
+
+    function connect() {
+      const ws = new WebSocket(`ws://${location.host}`);
+
+      ws.addEventListener('open', () => {
+        ws.send(JSON.stringify({ type: 'register', role: 'meta-preview' }));
+        status.textContent = 'connected';
+      });
+
+      ws.addEventListener('message', ({ data }) => {
+        const msg = JSON.parse(data);
+        if (msg.type !== 'story-rendered' || !msg.brushData) return;
+        label.textContent = `${msg.kind} / ${msg.name}`;
+        currentData = msg.brushData;
+        btnSend.disabled = false;
+        cmdStatus.textContent = `${msg.brushData.commands.length} commands ready`;
+        progressBar.style.width = '0%';
+        sendToOpenBrush(currentData);
+      });
+
+      ws.addEventListener('close', () => {
+        status.textContent = 'disconnected — retrying…';
+        setTimeout(connect, 2000);
+      });
+
+      ws.addEventListener('error', () => ws.close());
+    }
+
+    connect();
+  </script>
+</body>
+</html>

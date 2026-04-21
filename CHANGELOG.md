@@ -1,5 +1,26 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `openbrush` setup: Open Brush HTTP API command stories
+- `src/openbrush/utils.js` — command builders: `setColor`, `setSize`, `path`, `line`, `rect`, `polygon`, `circle`, `star` using correct Open Brush API (`draw.path`, `color.set.rgb`, `brush.size.set`)
+- `src/openbrush/fractals.js` — `sierpinskiTriangle`, `kochSnowflake`, `dragonCurve`, `hilbertCurve`, `barnsleyFern`
+- `src/openbrush/story.js` — `openbrushStory()` helper; sets `window.__metaPreviewBrush` and returns a live 2D canvas preview of the strokes
+- `src/openbrush/atoms/Shapes.stories.js` — Line, Square, Triangle, Circle, Hexagon, Pentagon, Star5, Star8, Cross
+- `src/openbrush/molecules/Compositions.stories.js` — NestedSquares, ConcentricCircles, Mandala, DotGrid, InterlockingRings, Snowflake
+- `src/openbrush/organisms/Fractals.stories.js` — SierpinskiTriangle (depth 4), KochSnowflake (depth 4), DragonCurve (10 iterations), HilbertCurve (order 4), BarnsleyFern (5000 IFS points), SierpinskiTriColour, DoubleDragon
+- `.storybook-openbrush/` config (main.js, preview.js, preview-head.html)
+- `public/meta-preview-openbrush.html` — sends command sequences to Open Brush via HTTP API with progress bar; auto-sends on story select; brush anchored at (0,1.5,0) so drawings appear at eye height
+- `src/storybook-channel.js` extended: detects `window.__metaPreviewBrush` and sends `brushData`
+- Scripts: `storybook:openbrush`, `relay:openbrush`, `dev:openbrush`, `build:openbrush`
+- `docs/sdk-openbrush.md` updated with correct API commands sourced from Open Brush source code
+
+### Fixed
+- Corrected Open Brush API command format throughout: `draw.path=[x,y,z],...` for paths, `color.set.rgb=r,g,b`, `brush.size.set=N`, `new` (not `sketches.new`)
+- BarnsleyFern dots batched as 100 `draw.path` params per GET request (was 5000 individual requests)
+- BarnsleyFern dots use 3-point arcs so `DrawNestedTrList` correctly adds the final endpoint
+
 ## [0.5.1] - 2026-04-21
 
 ### Changed

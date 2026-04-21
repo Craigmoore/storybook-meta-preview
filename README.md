@@ -100,6 +100,27 @@ yarn dev:audio
 - `Audio / Molecules / Chord` — C Major, A Minor, D Major 7
 - `Audio / Organisms / Progression` — I–vi–IV–V and a blues loop
 
+### openbrush
+
+Open Brush API command stories. Stories generate sequences of brush commands; the Storybook preview renders a 2D canvas preview. The meta-preview sends commands to a running Open Brush instance via its HTTP API.
+
+Requires Open Brush running with `--EnableApiRemoteCalls --EnableApiCorsHeaders`.
+
+| | |
+|---|---|
+| Storybook | `http://[host]:6010` |
+| Meta Preview | `http://[host]:3337/meta-preview-openbrush.html` |
+
+**Run:**
+```bash
+yarn dev:openbrush
+```
+
+**Stories:**
+- `OpenBrush / Atoms / Shapes` — Line, Square, Triangle, Circle, Hexagon, Pentagon, Star5, Star8, Cross
+- `OpenBrush / Molecules / Compositions` — NestedSquares, ConcentricCircles, Mandala, DotGrid, InterlockingRings, Snowflake
+- `OpenBrush / Organisms / Fractals` — SierpinskiTriangle, KochSnowflake, DragonCurve, HilbertCurve, BarnsleyFern, SierpinskiTriColour, DoubleDragon
+
 ---
 
 ## Installation
