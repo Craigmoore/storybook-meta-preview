@@ -11,4 +11,5 @@
 export const setups = {
   html:        { storybookPort: 6006, relayPort: 3333 },
   'threejs-2d': { storybookPort: 6007, relayPort: 3334 },
+  'threejs-3d': { storybookPort: 6008, relayPort: 3335 },
 };

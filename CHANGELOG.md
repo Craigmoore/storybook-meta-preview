@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `threejs-3d` setup: perspective Three.js scenes via `@storybook/html-webpack5`
+- `src/threejs-3d/scene-canvas.js` — helper with perspective camera, ambient + directional lighting, and `edgesGeometry` util
+- `src/threejs-3d/atoms/Box.stories.js` — solid and wireframe box variants
+- `src/threejs-3d/atoms/Sphere.stories.js` — default and shiny (metalness/roughness) sphere variants
+- `src/threejs-3d/molecules/Composition.stories.js` — box + sphere side-by-side, and a stacked tower
+- `.storybook-threejs-3d/` config (main.js, preview.js, preview-head.html)
+- `public/meta-preview-threejs-3d.html` — standalone meta-preview with perspective renderer and `OrbitControls`
+- Scripts: `storybook:threejs-3d`, `relay:threejs-3d`, `dev:threejs-3d`, `build:threejs-3d`
+- `OrbitControls` added to `meta-preview-threejs-2d.html`
+
 ## [0.3.0] - 2026-04-21
 
 ### Added

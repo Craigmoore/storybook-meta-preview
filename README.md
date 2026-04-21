@@ -62,6 +62,25 @@ yarn dev:threejs-2d
 - `ThreeJS-2D / Atoms / Circle` — filled and ring variants
 - `ThreeJS-2D / Molecules / Layout` — side-by-side and stacked compositions
 
+### threejs-3d
+
+Perspective Three.js scenes. Reference example for the "ThreeJS 3D component approach". Stories build 3D geometry scenes using `BoxGeometry`, `SphereGeometry` etc. with `MeshStandardMaterial` and default lighting. The meta-preview owns a Three.js perspective renderer with `OrbitControls` and rebuilds the scene via `ObjectLoader` on every story change.
+
+| | |
+|---|---|
+| Storybook | `http://[host]:6008` |
+| Meta Preview | `http://[host]:3335/meta-preview-threejs-3d.html` |
+
+**Run:**
+```bash
+yarn dev:threejs-3d
+```
+
+**Stories:**
+- `ThreeJS-3D / Atoms / Box` — solid and wireframe variants
+- `ThreeJS-3D / Atoms / Sphere` — default and shiny (metalness/roughness) variants
+- `ThreeJS-3D / Molecules / Composition` — box + sphere side-by-side, and a stacked tower
+
 ---
 
 ## Installation
