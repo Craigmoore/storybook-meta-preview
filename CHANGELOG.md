@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.4.0] - 2026-04-21
 
 ### Added
 - `threejs-3d` setup: perspective Three.js scenes via `@storybook/html-webpack5`
