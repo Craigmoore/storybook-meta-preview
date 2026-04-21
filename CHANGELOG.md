@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.5.0] - 2026-04-21
 
 ### Added
 - `audio` setup: structured music data stories with Tone.js playback in the meta-preview
