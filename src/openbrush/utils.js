@@ -1,5 +1,6 @@
 const round = n => Math.round(n * 10000) / 10000;
-const pt = (x, y) => `[${round(x)},${round(y)},0]`;
+const pt   = (x, y)    => `[${round(x)},${round(y)},0]`;
+const pt3d = (x, y, z) => `[${round(x)},${round(y)},${round(z)}]`;
 
 export const setColor = (r, g, b) =>
   `color.set.rgb=${round(r)},${round(g)},${round(b)}`;
@@ -41,6 +42,12 @@ export function polygon(cx, cy, radius, sides, rotation = -Math.PI / 2) {
 export function circle(cx, cy, radius, segments = 64) {
   return polygon(cx, cy, radius, segments, 0);
 }
+
+export function path3d(points) {
+  if (points.length < 2) return [];
+  return [`draw.path=${points.map(([x, y, z = 0]) => pt3d(x, y, z)).join(',')}`];
+}
+
 
 export function star(cx, cy, outerR, innerR, points) {
   const pts = [];

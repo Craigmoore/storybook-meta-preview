@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `src/openbrush/geometry.js` — `edgesFromGeometry(geometry, matrix?, batchSize?)` converts any Three.js `BufferGeometry` into `draw.path` commands via `EdgesGeometry`; batching support for large geometries
+- `path3d` helper in `src/openbrush/utils.js` — `draw.path` with explicit Z coordinates; oblique projection in canvas preview so 3D strokes render with visible depth
+- `src/openbrush/atoms/Volumes.stories.js` — 12 volumetric atoms using Three.js geometry: Cube, Sphere, Cylinder, Cone, Torus, TorusKnot, Icosahedron, Octahedron, Tetrahedron, Dodecahedron, Capsule, TriangularPrism
+- `src/openbrush/molecules/structures.js` — `makeTerrain` (Perlin fBm, 20×20), `terrainHeight`, `makeRoadNetwork` (organic branching, terrain-conforming), `makeTree`, `makeRock`, `makeScene(seed)` — full village layout with proximity-checked placement of houses, trees, and rocks all following terrain height
+- `src/openbrush/molecules/Structures.stories.js` — Terrain, Road, Tree, Rocks, SmallHouse stories
+- `src/openbrush/organisms/Village.stories.js` — Village scene organism
+
 ## [0.6.0] - 2026-04-21
 
 ### Added

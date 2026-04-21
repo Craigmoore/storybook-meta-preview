@@ -17,16 +17,16 @@ function drawPath(ctx, val, cr, cg, cb, strokeW, toCanvas) {
   const pts = [];
   for (const m of val.matchAll(/\[([^\]]+)\]/g)) {
     const parts = m[1].split(',');
-    pts.push([parseFloat(parts[0]), parseFloat(parts[1])]);
+    pts.push([parseFloat(parts[0]), parseFloat(parts[1]), parseFloat(parts[2] || 0)]);
   }
   if (pts.length < 2) return;
   ctx.strokeStyle = `rgba(${Math.round(cr*255)},${Math.round(cg*255)},${Math.round(cb*255)},0.85)`;
   ctx.lineWidth = strokeW;
   ctx.beginPath();
-  const [sx, sy] = toCanvas(pts[0][0], pts[0][1]);
+  const [sx, sy] = toCanvas(pts[0][0], pts[0][1], pts[0][2]);
   ctx.moveTo(sx, sy);
   for (let i = 1; i < pts.length; i++) {
-    const [px, py] = toCanvas(pts[i][0], pts[i][1]);
+    const [px, py] = toCanvas(pts[i][0], pts[i][1], pts[i][2]);
     ctx.lineTo(px, py);
   }
   ctx.stroke();
@@ -39,7 +39,8 @@ function renderPreview(ctx, W, H, commands) {
   const scale = W * 0.28;
   const ox = W / 2;
   const oy = H / 2;
-  const toCanvas = (x, y) => [ox + x * scale, oy - y * scale];
+  // Oblique projection: z shifts x left/up to suggest depth
+  const toCanvas = (x, y, z = 0) => [ox + (x - z * 0.4) * scale, oy - (y + z * 0.3) * scale];
 
   let cr = 1, cg = 1, cb = 1;
   let strokeW = 1.2;
