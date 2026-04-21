@@ -43,6 +43,25 @@ yarn dev:html
 - `Atoms / World` — renders `<span class="atom">World</span>`
 - `Molecules / Greeting` — composes Hello + World with a live `name` arg control
 
+### threejs-2d
+
+Orthographic Three.js scenes. Reference example for the "ThreeJS 2D layout approach". Stories build flat geometry scenes using `PlaneGeometry`, `CircleGeometry` etc. with `MeshBasicMaterial` (no lighting needed). The meta-preview owns a Three.js renderer and rebuilds the scene via `ObjectLoader` on every story change.
+
+| | |
+|---|---|
+| Storybook | `http://[host]:6007` |
+| Meta Preview | `http://[host]:3334/meta-preview-threejs-2d.html` |
+
+**Run:**
+```bash
+yarn dev:threejs-2d
+```
+
+**Stories:**
+- `ThreeJS-2D / Atoms / Rectangle` — filled and outlined variants
+- `ThreeJS-2D / Atoms / Circle` — filled and ring variants
+- `ThreeJS-2D / Molecules / Layout` — side-by-side and stacked compositions
+
 ---
 
 ## Installation

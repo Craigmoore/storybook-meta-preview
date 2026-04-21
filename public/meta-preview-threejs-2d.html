@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Meta Preview — ThreeJS 2D</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #1a1a1a; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+    canvas { display: block; }
+    #status { position: fixed; top: 8px; right: 12px; font: 11px monospace; color: #555; }
+    #story-label { position: fixed; bottom: 12px; left: 12px; font: 11px monospace; color: #555; }
+  </style>
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js" } }
+  </script>
+</head>
+<body>
+  <div id="status">connecting…</div>
+  <canvas id="canvas"></canvas>
+  <div id="story-label"></div>
+
+  <script type="module">
+    import * as THREE from 'three';
+
+    const status  = document.getElementById('status');
+    const label   = document.getElementById('story-label');
+    const canvas  = document.getElementById('canvas');
+
+    // Fixed orthographic setup — matches scene-canvas.js conventions
+    const frustum = 2;
+    const W = Math.min(window.innerWidth, window.innerHeight);
+    canvas.width  = W;
+    canvas.height = W;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(W, W);
+
+    const camera = new THREE.OrthographicCamera(-frustum, frustum, frustum, -frustum, 0.1, 10);
+    camera.position.z = 5;
+
+    let scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a1a1a);
+
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    function connect() {
+      const ws = new WebSocket(`ws://${location.host}`);
+
+      ws.addEventListener('open', () => {
+        ws.send(JSON.stringify({ type: 'register', role: 'meta-preview' }));
+        status.textContent = 'connected';
+      });
+
+      ws.addEventListener('message', ({ data }) => {
+        const msg = JSON.parse(data);
+        if (msg.type !== 'story-rendered' || !msg.sceneJson) return;
+
+        const loader = new THREE.ObjectLoader();
+        scene = loader.parse(msg.sceneJson);
+        label.textContent = `${msg.kind} / ${msg.name}`;
+      });
+
+      ws.addEventListener('close', () => {
+        status.textContent = 'disconnected — retrying…';
+        setTimeout(connect, 2000);
+      });
+
+      ws.addEventListener('error', () => ws.close());
+    }
+
+    connect();
+  </script>
+</body>
+</html>

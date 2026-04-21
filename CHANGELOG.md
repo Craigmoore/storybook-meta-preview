@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `threejs-2d` setup: orthographic Three.js scenes via `@storybook/html-webpack5`
+- `src/threejs-2d/scene-canvas.js` — shared helper; builds orthographic scene, exposes it via `window.__metaPreviewScene`, renders to canvas for Storybook's preview
+- `src/threejs-2d/atoms/Rectangle.stories.js` — filled and outlined rectangle variants
+- `src/threejs-2d/atoms/Circle.stories.js` — filled and ring circle variants
+- `src/threejs-2d/molecules/Layout.stories.js` — side-by-side and stacked compositions
+- `.storybook-threejs-2d/` config (main.js, preview.js, preview-head.html)
+- `public/meta-preview-threejs-2d.html` — standalone meta-preview with own Three.js orthographic renderer; reconstructs scene from `sceneJson` via `ObjectLoader`
+- `src/storybook-channel.js` extended: detects `window.__metaPreviewScene` and sends `sceneJson` instead of HTML
+- `PLAN.md` — setup roadmap with all planned setups
+- Scripts: `storybook:threejs-2d`, `relay:threejs-2d`, `dev:threejs-2d`, `build:threejs-2d`
+- `three` added as a dependency
+
 ## [0.2.0] - 2026-04-20
 
 ### Added

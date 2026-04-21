@@ -12,11 +12,26 @@ relay.addEventListener('open', () => {
 
 export const decorators = [
   (StoryFn, context) => {
+    window.__metaPreviewScene = null;
     const result = StoryFn();
 
     requestAnimationFrame(() => {
+      if (relay.readyState !== WebSocket.OPEN) return;
+
+      if (window.__metaPreviewScene) {
+        relay.send(JSON.stringify({
+          type: 'story-rendered',
+          storyId: context.id,
+          name: context.name,
+          kind: context.kind,
+          sceneJson: window.__metaPreviewScene.toJSON(),
+        }));
+        window.__metaPreviewScene = null;
+        return;
+      }
+
       const root = document.querySelector('#storybook-root');
-      if (!root || relay.readyState !== WebSocket.OPEN) return;
+      if (!root) return;
 
       relay.send(JSON.stringify({
         type: 'story-rendered',

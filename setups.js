@@ -9,5 +9,6 @@
 //   4. Add "storybook:[name]", "relay:[name]", "dev:[name]" scripts to package.json
 
 export const setups = {
-  html: { storybookPort: 6006, relayPort: 3333 },
+  html:        { storybookPort: 6006, relayPort: 3333 },
+  'threejs-2d': { storybookPort: 6007, relayPort: 3334 },
 };

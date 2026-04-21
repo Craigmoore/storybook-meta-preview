@@ -1,15 +1,21 @@
 {
   "name": "storybook-meta-preview",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "storybook:html": "storybook dev -c .storybook-html -p 6006 --host 0.0.0.0",
     "relay:html": "PORT=3333 node src/relay.js",
     "dev:html": "concurrently \"yarn relay:html\" \"yarn storybook:html\"",
-    "build:html": "storybook build -c .storybook-html"
+    "build:html": "storybook build -c .storybook-html",
+
+    "storybook:threejs-2d": "STORYBOOK_RELAY_PORT=3334 storybook dev -c .storybook-threejs-2d -p 6007 --host 0.0.0.0",
+    "relay:threejs-2d": "PORT=3334 node src/relay.js",
+    "dev:threejs-2d": "concurrently \"yarn relay:threejs-2d\" \"yarn storybook:threejs-2d\"",
+    "build:threejs-2d": "storybook build -c .storybook-threejs-2d"
   },
   "dependencies": {
     "express": "^4.18.2",
+    "three": "^0.170.0",
     "ws": "^8.18.0"
   },
   "devDependencies": {
