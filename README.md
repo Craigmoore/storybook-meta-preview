@@ -96,13 +96,15 @@ yarn dev:audio
 ```
 
 **Stories:**
-- `Audio / Atoms / Note` — single notes (Middle C, High A, Long E)
-- `Audio / Molecules / Chord` — C Major, A Minor, D Major 7
-- `Audio / Organisms / Progression` — I–vi–IV–V and a blues loop
+- `Audio / Atoms / Note` — 7 single notes from sub-bass (A1) to stratosphere (C8)
+- `Audio / Molecules / Chord` — 14 chords: triads, sevenths, extended, quartal, cluster, power chord
+- `Audio / Organisms / Progression` — 9 progressions: Pop Loop, Jazz ii–V–I, Andalusian, Pachelbel, 12-bar Blues, Circle of Fifths, Chromatic Rise, Celtic Melody, Dorian Vamp
 
 ### openbrush
 
-Open Brush API command stories. Stories generate sequences of brush commands; the Storybook preview renders a 2D canvas preview. The meta-preview sends commands to a running Open Brush instance via its HTTP API.
+Open Brush API command stories. Stories generate sequences of brush commands; the Storybook preview renders a 2D canvas preview with oblique projection so 3D strokes have visible depth. The meta-preview auto-sends commands to a running Open Brush instance via its HTTP API whenever a story is selected.
+
+Three.js is used as a pure geometry calculator — `EdgesGeometry` extracts wireframe edges from any `BufferGeometry`, which are then converted to `draw.path` commands. No Three.js renderer is used.
 
 Requires Open Brush running with `--EnableApiRemoteCalls --EnableApiCorsHeaders`.
 
@@ -116,10 +118,19 @@ Requires Open Brush running with `--EnableApiRemoteCalls --EnableApiCorsHeaders`
 yarn dev:openbrush
 ```
 
+**Meta-preview controls:**
+- **send to open brush** — re-sends the current story manually
+- **save** — saves the current sketch to a new slot (`save.new`)
+- **export** — exports the sketch to Open Brush's Exports folder (`export.current`)
+- **show exports** — opens the Exports folder on the desktop (`showfolder.exports`)
+
 **Stories:**
-- `OpenBrush / Atoms / Shapes` — Line, Square, Triangle, Circle, Hexagon, Pentagon, Star5, Star8, Cross
+- `OpenBrush / Atoms / Shapes` — Line, Square, Triangle, Circle, Hexagon, Pentagon, Star5, Star8, Cross (all with interactive controls)
+- `OpenBrush / Atoms / Volumes` — 12 Three.js geometry primitives: Cube, Sphere, Cylinder, Cone, Torus, TorusKnot, Icosahedron, Octahedron, Tetrahedron, Dodecahedron, Capsule, TriangularPrism
 - `OpenBrush / Molecules / Compositions` — NestedSquares, ConcentricCircles, Mandala, DotGrid, InterlockingRings, Snowflake
+- `OpenBrush / Molecules / Structures` — Terrain (Perlin fBm), Road (organic branching, terrain-conforming, independent road/terrain seeds), Tree, Rocks, SmallHouse
 - `OpenBrush / Organisms / Fractals` — SierpinskiTriangle, KochSnowflake, DragonCurve, HilbertCurve, BarnsleyFern, SierpinskiTriColour, DoubleDragon
+- `OpenBrush / Organisms / Village` — full scene: terrain + road network + proximity-placed houses, trees, and rocks
 
 ---
 
@@ -161,9 +172,21 @@ src/
   [name]/                   # stories per setup
     atoms/
     molecules/
+    organisms/
   relay.js                  # Express + WebSocket relay server (shared)
   storybook-channel.js      # shared decorator — captures renders, sends to relay
+  openbrush/
+    geometry.js             # edgesFromGeometry() — Three.js geometry → draw.path commands
+    utils.js                # command builders: setColor, setSize, path, path3d, line, etc.
+    fractals.js             # sierpinskiTriangle, kochSnowflake, dragonCurve, hilbertCurve, barnsleyFern
+    story.js                # openbrushStory() helper — canvas preview with oblique projection
+    molecules/
+      structures.js         # makeTerrain, makeRoadNetwork, makeTree, makeRock, makeScene
 public/
-  meta-preview.html         # standalone meta-preview page (shared)
+  meta-preview.html                  # html setup meta-preview
+  meta-preview-threejs-2d.html       # threejs-2d meta-preview
+  meta-preview-threejs-3d.html       # threejs-3d meta-preview (with OrbitControls)
+  meta-preview-audio.html            # audio meta-preview (Tone.js player)
+  meta-preview-openbrush.html        # openbrush meta-preview (HTTP API sender)
 setups.js                   # registry of all setups and their ports
 ```
