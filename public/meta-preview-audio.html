@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Meta Preview — Audio</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #1a1a1a;
+      color: #ccc;
+      font-family: monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      gap: 32px;
+      overflow: hidden;
+    }
+    #status { position: fixed; top: 8px; right: 12px; font-size: 11px; color: #555; }
+    #story-label { position: fixed; top: 8px; left: 12px; font-size: 11px; color: #555; }
+
+    #display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      min-height: 120px;
+      justify-content: center;
+    }
+    .note-name { font-size: 4rem; font-weight: bold; color: #e94560; letter-spacing: 0.05em; }
+    .note-pill {
+      display: inline-block;
+      padding: 6px 14px;
+      border: 1px solid #333;
+      border-radius: 4px;
+      color: #aaa;
+      font-size: 1rem;
+      margin: 3px;
+      transition: border-color 0.1s, color 0.1s;
+    }
+    .note-pill.active { border-color: #e94560; color: #e94560; }
+    .notes-row, .steps-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; justify-content: center; }
+    .progression-step { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px; border: 1px solid #222; border-radius: 4px; transition: border-color 0.1s; }
+    .progression-step.active { border-color: #e94560; }
+    .arrow { color: #444; font-size: 1.2rem; padding: 0 4px; }
+    .note-meta { font-size: 0.8rem; color: #555; }
+
+    #controls { display: flex; gap: 12px; }
+    button {
+      background: none;
+      border: 1px solid #e94560;
+      color: #e94560;
+      font-family: monospace;
+      font-size: 0.9rem;
+      padding: 8px 24px;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+    button:hover { background: #e9456015; }
+    button:disabled { border-color: #444; color: #444; cursor: default; }
+
+    #waveform { border-top: 1px solid #222; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/tone@14.9.7/build/Tone.js"></script>
+</head>
+<body>
+  <div id="status">connecting…</div>
+  <div id="story-label"></div>
+  <div id="display"><span style="color:#444">waiting for story…</span></div>
+  <div id="controls">
+    <button id="btn-play" disabled>play</button>
+    <button id="btn-stop" disabled>stop</button>
+  </div>
+  <canvas id="waveform" width="600" height="80"></canvas>
+
+  <script type="module">
+    const status   = document.getElementById('status');
+    const label    = document.getElementById('story-label');
+    const display  = document.getElementById('display');
+    const btnPlay  = document.getElementById('btn-play');
+    const btnStop  = document.getElementById('btn-stop');
+    const waveform = document.getElementById('waveform');
+    const wCtx     = waveform.getContext('2d');
+
+    // --- Tone.js setup ---
+    const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+    const analyser = new Tone.Analyser('waveform', 512);
+    Tone.Destination.connect(analyser);
+
+    let currentData = null;
+    let currentPart = null;
+
+    function stopPlayback() {
+      Tone.Transport.stop();
+      Tone.Transport.cancel();
+      if (currentPart) { currentPart.dispose(); currentPart = null; }
+      synth.releaseAll();
+      clearActiveStates();
+    }
+
+    function clearActiveStates() {
+      display.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
+    }
+
+    async function play() {
+      await Tone.start();
+      stopPlayback();
+
+      if (!currentData) return;
+
+      if (currentData.type === 'note') {
+        synth.triggerAttackRelease(currentData.note, currentData.duration ?? '4n');
+        display.querySelectorAll('.note-pill').forEach(el => {
+          el.classList.add('active');
+          setTimeout(() => el.classList.remove('active'), Tone.Time(currentData.duration ?? '4n').toSeconds() * 1000);
+        });
+
+      } else if (currentData.type === 'chord') {
+        synth.triggerAttackRelease(currentData.notes, currentData.duration ?? '2n');
+        const duration = Tone.Time(currentData.duration ?? '2n').toSeconds() * 1000;
+        display.querySelectorAll('.note-pill').forEach(el => {
+          el.classList.add('active');
+          setTimeout(() => el.classList.remove('active'), duration);
+        });
+
+      } else if (currentData.type === 'progression') {
+        Tone.Transport.bpm.value = currentData.bpm ?? 120;
+
+        const steps = currentData.steps;
+        const stepEls = display.querySelectorAll('.progression-step');
+
+        let offset = 0;
+        currentPart = new Tone.Part((time, ev) => {
+          synth.triggerAttackRelease(ev.notes, ev.duration, time);
+          Tone.getDraw().schedule(() => {
+            clearActiveStates();
+            if (stepEls[ev.index]) stepEls[ev.index].classList.add('active');
+          }, time);
+        }, steps.map((step, index) => {
+          const ev = { time: offset, notes: step.notes, duration: step.duration ?? '4n', index };
+          offset += Tone.Time(step.duration ?? '4n').toSeconds();
+          return ev;
+        }));
+
+        currentPart.start(0);
+        Tone.Transport.start('+0.05');
+      }
+    }
+
+    btnPlay.addEventListener('click', play);
+    btnStop.addEventListener('click', stopPlayback);
+
+    // --- Waveform draw loop ---
+    function drawWaveform() {
+      requestAnimationFrame(drawWaveform);
+      const values = analyser.getValue();
+      const W = waveform.width, H = waveform.height;
+      wCtx.clearRect(0, 0, W, H);
+      wCtx.beginPath();
+      for (let i = 0; i < values.length; i++) {
+        const x = (i / (values.length - 1)) * W;
+        const y = ((values[i] + 1) / 2) * H;
+        i === 0 ? wCtx.moveTo(x, y) : wCtx.lineTo(x, y);
+      }
+      wCtx.strokeStyle = '#e94560';
+      wCtx.lineWidth = 1.5;
+      wCtx.stroke();
+    }
+    drawWaveform();
+
+    // --- Build display from audio data ---
+    function renderDisplay(data) {
+      stopPlayback();
+      currentData = data;
+      btnPlay.disabled = false;
+      btnStop.disabled = false;
+
+      if (data.type === 'note') {
+        display.innerHTML = `
+          <span class="note-name note-pill">${data.note}</span>
+          <span class="note-meta">${data.duration ?? '4n'}</span>`;
+
+      } else if (data.type === 'chord') {
+        const pills = data.notes.map(n => `<span class="note-pill">${n}</span>`).join('');
+        display.innerHTML = `
+          <div class="notes-row">${pills}</div>
+          <span class="note-meta">${data.duration ?? '2n'}</span>`;
+
+      } else if (data.type === 'progression') {
+        const steps = data.steps.map(s => {
+          const pills = s.notes.map(n => `<span class="note-pill">${n}</span>`).join('');
+          return `<div class="progression-step">${pills}</div>`;
+        }).join('<span class="arrow">→</span>');
+        display.innerHTML = `
+          <div class="steps-row">${steps}</div>
+          <span class="note-meta">${data.bpm ?? 120} bpm</span>`;
+      }
+    }
+
+    // --- WebSocket ---
+    function connect() {
+      const ws = new WebSocket(`ws://${location.host}`);
+
+      ws.addEventListener('open', () => {
+        ws.send(JSON.stringify({ type: 'register', role: 'meta-preview' }));
+        status.textContent = 'connected';
+      });
+
+      ws.addEventListener('message', ({ data }) => {
+        const msg = JSON.parse(data);
+        if (msg.type !== 'story-rendered' || !msg.audioData) return;
+        label.textContent = `${msg.kind} / ${msg.name}`;
+        renderDisplay(msg.audioData);
+      });
+
+      ws.addEventListener('close', () => {
+        status.textContent = 'disconnected — retrying…';
+        setTimeout(connect, 2000);
+      });
+
+      ws.addEventListener('error', () => ws.close());
+    }
+
+    connect();
+  </script>
+</body>
+</html>

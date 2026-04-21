@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `audio` setup: structured music data stories with Tone.js playback in the meta-preview
+- `src/audio/story.js` — `audioStory(data)` helper; sets `window.__metaPreviewData` and returns styled HTML for Storybook's preview
+- `src/audio/atoms/Note.stories.js` — Middle C, High A, Long E
+- `src/audio/molecules/Chord.stories.js` — C Major, A Minor, D Major 7
+- `src/audio/organisms/Progression.stories.js` — I–vi–IV–V and a blues loop
+- `.storybook-audio/` config (main.js, preview.js, preview-head.html)
+- `public/meta-preview-audio.html` — Tone.js player with play/stop buttons, waveform visualiser, and active-note highlighting; stops and resets on every story change
+- `src/storybook-channel.js` extended: detects `window.__metaPreviewData` and sends `audioData`
+- Scripts: `storybook:audio`, `relay:audio`, `dev:audio`, `build:audio`
+
 ## [0.4.0] - 2026-04-21
 
 ### Added

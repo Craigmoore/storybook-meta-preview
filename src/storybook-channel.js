@@ -13,6 +13,7 @@ relay.addEventListener('open', () => {
 export const decorators = [
   (StoryFn, context) => {
     window.__metaPreviewScene = null;
+    window.__metaPreviewData = null;
     const result = StoryFn();
 
     requestAnimationFrame(() => {
@@ -31,6 +32,18 @@ export const decorators = [
           console.error('[storybook-channel] scene serialization failed:', err);
         }
         window.__metaPreviewScene = null;
+        return;
+      }
+
+      if (window.__metaPreviewData) {
+        relay.send(JSON.stringify({
+          type: 'story-rendered',
+          storyId: context.id,
+          name: context.name,
+          kind: context.kind,
+          audioData: window.__metaPreviewData,
+        }));
+        window.__metaPreviewData = null;
         return;
       }
 

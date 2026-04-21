@@ -16,7 +16,12 @@
     "storybook:threejs-3d": "STORYBOOK_RELAY_PORT=3335 storybook dev -c .storybook-threejs-3d -p 6008 --host 0.0.0.0",
     "relay:threejs-3d": "PORT=3335 node src/relay.js",
     "dev:threejs-3d": "concurrently \"yarn relay:threejs-3d\" \"yarn storybook:threejs-3d\"",
-    "build:threejs-3d": "storybook build -c .storybook-threejs-3d"
+    "build:threejs-3d": "storybook build -c .storybook-threejs-3d",
+
+    "storybook:audio": "STORYBOOK_RELAY_PORT=3336 storybook dev -c .storybook-audio -p 6009 --host 0.0.0.0",
+    "relay:audio": "PORT=3336 node src/relay.js",
+    "dev:audio": "concurrently \"yarn relay:audio\" \"yarn storybook:audio\"",
+    "build:audio": "storybook build -c .storybook-audio"
   },
   "dependencies": {
     "express": "^4.18.2",

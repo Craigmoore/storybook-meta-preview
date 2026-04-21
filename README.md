@@ -81,6 +81,25 @@ yarn dev:threejs-3d
 - `ThreeJS-3D / Atoms / Sphere` — default and shiny (metalness/roughness) variants
 - `ThreeJS-3D / Molecules / Composition` — box + sphere side-by-side, and a stacked tower
 
+### audio
+
+Structured music data stories. Stories return plain data objects (notes, chords, progressions) — the meta-preview owns the Tone.js engine entirely. Selecting a story updates the meta-preview display; press Play to hear it.
+
+| | |
+|---|---|
+| Storybook | `http://[host]:6009` |
+| Meta Preview | `http://[host]:3336/meta-preview-audio.html` |
+
+**Run:**
+```bash
+yarn dev:audio
+```
+
+**Stories:**
+- `Audio / Atoms / Note` — single notes (Middle C, High A, Long E)
+- `Audio / Molecules / Chord` — C Major, A Minor, D Major 7
+- `Audio / Organisms / Progression` — I–vi–IV–V and a blues loop
+
 ---
 
 ## Installation
