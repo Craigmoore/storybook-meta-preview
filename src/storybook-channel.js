@@ -19,13 +19,17 @@ export const decorators = [
       if (relay.readyState !== WebSocket.OPEN) return;
 
       if (window.__metaPreviewScene) {
-        relay.send(JSON.stringify({
-          type: 'story-rendered',
-          storyId: context.id,
-          name: context.name,
-          kind: context.kind,
-          sceneJson: window.__metaPreviewScene.toJSON(),
-        }));
+        try {
+          relay.send(JSON.stringify({
+            type: 'story-rendered',
+            storyId: context.id,
+            name: context.name,
+            kind: context.kind,
+            sceneJson: window.__metaPreviewScene.toJSON(),
+          }));
+        } catch (err) {
+          console.error('[storybook-channel] scene serialization failed:', err);
+        }
         window.__metaPreviewScene = null;
         return;
       }

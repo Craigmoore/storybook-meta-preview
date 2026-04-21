@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { sceneCanvas } from '../scene-canvas.js';
+import { sceneCanvas, edgesGeometry } from '../scene-canvas.js';
 
 export default { title: 'ThreeJS-2D/Atoms/Rectangle' };
 
@@ -20,7 +20,7 @@ export const Outlined = {
       new THREE.MeshBasicMaterial({ color: 0x16213e })
     );
     const edges = new THREE.LineSegments(
-      new THREE.EdgesGeometry(new THREE.PlaneGeometry(2, 1)),
+      edgesGeometry(new THREE.PlaneGeometry(2, 1)),
       new THREE.LineBasicMaterial({ color: 0xe94560 })
     );
     scene.add(mesh);

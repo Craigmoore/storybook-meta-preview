@@ -60,8 +60,12 @@
         const msg = JSON.parse(data);
         if (msg.type !== 'story-rendered' || !msg.sceneJson) return;
 
-        const loader = new THREE.ObjectLoader();
-        scene = loader.parse(msg.sceneJson);
+        try {
+          const loader = new THREE.ObjectLoader();
+          scene = loader.parse(msg.sceneJson);
+        } catch (err) {
+          console.error('[meta-preview] scene deserialization failed:', err);
+        }
         label.textContent = `${msg.kind} / ${msg.name}`;
       });
 

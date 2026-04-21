@@ -15,6 +15,10 @@
 - Scripts: `storybook:threejs-2d`, `relay:threejs-2d`, `dev:threejs-2d`, `build:threejs-2d`
 - `three` added as a dependency
 
+### Fixed
+- `EdgesGeometry` does not round-trip through `scene.toJSON()` / `ObjectLoader` — added `edgesGeometry()` helper in `scene-canvas.js` that copies edge buffer data into a plain `BufferGeometry`; updated `Rectangle / Outlined` story to use it
+- Added try/catch error logging in `storybook-channel.js` and `meta-preview-threejs-2d.html` for scene serialization/deserialization failures
+
 ## [0.2.0] - 2026-04-20
 
 ### Added

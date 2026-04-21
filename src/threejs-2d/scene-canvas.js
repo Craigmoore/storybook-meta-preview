@@ -11,6 +11,14 @@ import * as THREE from 'three';
 //   background     — scene background hex (default 0x1a1a1a)
 //   frustum        — half-height of the orthographic view (default 2)
 
+// EdgesGeometry serializes with a non-serializable `parameters.geometry` field.
+// Use this wrapper instead to get a plain BufferGeometry that round-trips via ObjectLoader.
+export function edgesGeometry(sourceGeometry) {
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.EdgesGeometry(sourceGeometry).getAttribute('position'));
+  return geo;
+}
+
 export function sceneCanvas(setupFn, { width = 400, height = 400, background = 0x1a1a1a, frustum = 2 } = {}) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(background);
