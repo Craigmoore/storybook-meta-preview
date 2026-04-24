@@ -1,5 +1,35 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `bantervr-ui` setup: BanterVR UI Toolkit story library with live in-world preview via WebSocket inject
+- `public/meta-preview-bantervr-ui.html` — standalone meta-preview page for BanterVR-UI stories
+- `public/meta-preview-bantervr-inject.js` — self-contained Banter inject script: connects to relay via WebSocket, reconstructs UI stories in-world using real BS APIs, destroys previous GameObjects on each update, auto-reconnects on disconnect
+- `public/bantervr-ui-test.js` — standalone Hello World debug script for verifying BanterUI panel rendering in-world
+- `src/bantervr-ui/mock-bs.js` — lightweight browser mock of the BanterVR BS namespace: `GameObject`, `BanterUIPanel`, `UILabel`, `UIButton`, `UISlider`, `UIToggle`, `UIScrollView`, `UIVisualElement`; `styleProxy` captures USS styles to a plain map for relay transport; `toJSON()` serialisation on all classes; `UNITY_TO_CSS` map for browser preview of `unityFontStyle`/`unityTextAlign`
+- `src/bantervr-ui/story.js` — `banterUiStory()` helper
+- `docs/unity-uitoolkit.md` — Unity UI Toolkit reference (USS properties, element types, selector syntax)
+- Atoms: `Buttons` (Button, ConfirmCancel, IconButton), `Labels` (Label), `Inputs` (Slider, Toggle), `VisualElement` (VisualElement, FlexRow, FlexColumn, FlexWrap, Nested)
+- Molecules: `ButtonGroup` (IconButton, ImageIconButton, ConfirmCancel), `ActionCard`, `Labels` (Scoreboard, StatusBadge), `Sliders` (SliderLabelled, SliderWithRange), `Toggles` (ToggleLabelled, ToggleGroup), `ScrollView` (VerticalList, HorizontalList, MixedContent), `SettingsPanel`
+- Relay messages for BanterVR-UI stories include `banterUIData` (serialised scene graph) alongside `banterUIHtml` (HTML preview)
+
+### Fixed
+- Inject script uses `BS.BanterUI` (not `BS.BanterUIPanel`) with `await AddComponent` — `BanterUI` is the class that renders a visible surface; `BanterUIPanel` alone produces only a collider
+- All UI elements created via `panel.CreateX(parent)` methods and individually awaited with `el.Async()`
+- UISlider range and value set via `SetProperty('lowValue')`, `SetProperty('highValue')`, `SetProperty('value')` with `WaitForEndOfFrame` between range and value
+- UIToggle initial state set via `SetProperty('value', 'true'/'false')` — Banter's JS→Unity bridge silently ignores JS booleans; string `'true'`/`'false'` required
+- UILabel default background set to `rgba(0,0,0,0)` in mock constructor — Unity applies white by default; explicit transparent value ensures it is always sent to Banter
+- `sanitizeStyles()` strips all properties that cause Unity UI Toolkit's `SetStyles` to abort and discard the entire call: `gap`/`rowGap`/`columnGap`, compound `padding`/`margin`/`border` shorthands, `wordSpacing`, all `unity*`-prefixed properties (`unityFontStyle`, `unityTextAlign`, etc.); unwraps `url('...')` syntax from `backgroundImage`
+- All compound `padding` shorthands replaced with individual `paddingTop/Right/Bottom/Left` throughout all story files
+- All `gap` on panel roots replaced with `marginBottom`/`marginRight` on child elements; `gap` moved to inner `UIVisualElement` containers where needed
+- SettingsPanel: sliders now initialised via `SetRange`/`SetValue`; toggles via `SetChecked` — previous direct `_el.setAttribute` calls bypassed serialisation so state was never sent to Banter; `flex` shorthand on sliders replaced with explicit `width`
+- VisualElement `Nested` story: compound `padding` in recursive `makeBox` replaced with individual properties — inner boxes had no size without padding and were invisible in Banter
+- `.storybook-bantervr-ui/preview-head.html` — added `box-sizing: border-box` on the panel root `<div>` so that padding set by stories does not inflate it beyond the panel width in the browser preview
+
+### Known limitations
+- `backgroundImage` on `UIVisualElement` does not render in BanterVR — Unity UI Toolkit requires a `Sprite`/`Texture2D` asset reference and does not support runtime HTTP/HTTPS URL strings; emoji characters are the recommended approach for inline icons
+
 ## [0.8.2] - 2026-04-21
 
 ### Changed

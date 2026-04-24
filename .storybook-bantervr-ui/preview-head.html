@@ -1,0 +1,85 @@
+<style>
+  body {
+    margin: 0;
+    background: #111318;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: system-ui, sans-serif;
+  }
+
+  .bantervr-ui-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 24px;
+  }
+
+  /* GameObject wrapper — invisible structural container */
+  .bs-gameobject { display: contents; }
+
+  /* Panel — approximates a floating BanterVR UI canvas */
+  /* Root div inside the panel is an unclassed div — force border-box so that
+     padding set by stories doesn't inflate the element beyond the panel width. */
+  .bs-panel > div { box-sizing: border-box; }
+
+  .bs-panel {
+    background: rgba(16, 18, 28, 0.97);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    box-shadow: 0 4px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.04);
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .bs-label {
+    font-family: system-ui, sans-serif;
+    color: #ffffff;
+    display: block;
+    box-sizing: border-box;
+  }
+
+  .bs-button {
+    background: rgba(50, 80, 180, 0.7);
+    border: 1px solid rgba(100, 140, 255, 0.4);
+    border-radius: 5px;
+    color: #ffffff;
+    font-family: system-ui, sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background 0.1s;
+  }
+  .bs-button:hover { background: rgba(70, 100, 210, 0.85); }
+
+  .bs-slider {
+    accent-color: #5b9fff;
+    cursor: pointer;
+    box-sizing: border-box;
+  }
+
+  .bs-toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 6px;
+    box-sizing: border-box;
+  }
+  .bs-toggle input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #5b9fff;
+    cursor: pointer;
+  }
+
+  .bs-scroll-view {
+    overflow: auto;
+    box-sizing: border-box;
+  }
+
+  .bs-visual-element {
+    box-sizing: border-box;
+  }
+</style>

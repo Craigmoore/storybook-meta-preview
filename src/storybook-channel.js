@@ -4,7 +4,7 @@
 // its dev script so this file stays setup-agnostic.
 
 const relayPort = process.env.STORYBOOK_RELAY_PORT ?? '3333';
-const relay = new WebSocket(`ws://${location.hostname}:${relayPort}`);
+const relay     = new WebSocket(`ws://${location.hostname}:${relayPort}`);
 
 relay.addEventListener('open', () => {
   relay.send(JSON.stringify({ type: 'register', role: 'storybook-channel' }));
@@ -12,9 +12,10 @@ relay.addEventListener('open', () => {
 
 export const decorators = [
   (StoryFn, context) => {
-    window.__metaPreviewScene = null;
-    window.__metaPreviewData = null;
-    window.__metaPreviewBrush = null;
+    window.__metaPreviewScene    = null;
+    window.__metaPreviewData     = null;
+    window.__metaPreviewBrush    = null;
+    window.__metaPreviewBanterUI = null;
     const result = StoryFn();
 
     requestAnimationFrame(() => {
@@ -62,6 +63,19 @@ export const decorators = [
 
       const root = document.querySelector('#storybook-root');
       if (!root) return;
+
+      if (window.__metaPreviewBanterUI) {
+        relay.send(JSON.stringify({
+          type: 'story-rendered',
+          storyId: context.id,
+          name: context.name,
+          kind: context.kind,
+          banterUIHtml: root.innerHTML,
+          banterUIData: window.__metaPreviewBanterUI.sceneData,
+        }));
+        window.__metaPreviewBanterUI = null;
+        return;
+      }
 
       relay.send(JSON.stringify({
         type: 'story-rendered',

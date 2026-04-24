@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Meta Preview — BanterVR UI</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d0f16;
+      background-image:
+        radial-gradient(ellipse at 30% 40%, rgba(40, 60, 120, 0.18) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 70%, rgba(80, 30, 120, 0.12) 0%, transparent 60%);
+      color: #ccc;
+      font-family: system-ui, monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 24px;
+    }
+
+    /* ── Status bar ── */
+    #status      { position: fixed; top: 10px; right: 14px; font-size: 11px; color: #444; font-family: monospace; }
+    #story-label { position: fixed; top: 10px; left:  14px; font-size: 11px; color: #444; font-family: monospace; }
+
+    /* ── BS indicator ── */
+    #bs-indicator {
+      position: fixed;
+      bottom: 14px;
+      right: 14px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+      font-family: monospace;
+      color: #555;
+      padding: 5px 10px;
+      border: 1px solid #222;
+      border-radius: 20px;
+      background: rgba(0,0,0,0.4);
+    }
+    #bs-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #333;
+      flex-shrink: 0;
+    }
+    #bs-indicator.detected    { color: #52e08a; border-color: #1a5c38; }
+    #bs-indicator.detected #bs-dot { background: #52e08a; box-shadow: 0 0 6px #52e08a; }
+
+    /* ── Preview area ── */
+    #preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    #placeholder {
+      font-size: 13px;
+      color: #333;
+      font-family: monospace;
+    }
+
+    /* ── BanterVR UI panel styles (matches preview-head.html) ── */
+    .bantervr-ui-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 24px;
+    }
+
+    .bs-gameobject { display: contents; }
+
+    .bs-panel {
+      background: rgba(16, 18, 28, 0.97);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      box-shadow: 0 4px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.04);
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .bs-label {
+      font-family: system-ui, sans-serif;
+      color: #ffffff;
+      display: block;
+      box-sizing: border-box;
+    }
+
+    .bs-button {
+      background: rgba(50, 80, 180, 0.7);
+      border: 1px solid rgba(100, 140, 255, 0.4);
+      border-radius: 5px;
+      color: #ffffff;
+      font-family: system-ui, sans-serif;
+      font-size: 16px;
+      cursor: pointer;
+      box-sizing: border-box;
+      transition: background 0.1s;
+    }
+    .bs-button:hover { background: rgba(70, 100, 210, 0.85); }
+
+    .bs-slider {
+      accent-color: #5b9fff;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+
+    .bs-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      gap: 6px;
+      box-sizing: border-box;
+    }
+    .bs-toggle input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #5b9fff;
+      cursor: pointer;
+    }
+
+    .bs-scroll-view  { overflow: auto; box-sizing: border-box; }
+    .bs-visual-element { box-sizing: border-box; }
+  </style>
+</head>
+<body>
+  <div id="status">connecting…</div>
+  <div id="story-label"></div>
+
+  <div id="preview">
+    <div id="placeholder">waiting for story…</div>
+  </div>
+
+  <div id="bs-indicator">
+    <div id="bs-dot"></div>
+    <span id="bs-label">BS not detected — browser mock</span>
+  </div>
+
+  <script type="module">
+    const status      = document.getElementById('status');
+    const storyLabel  = document.getElementById('story-label');
+    const preview     = document.getElementById('preview');
+    const placeholder = document.getElementById('placeholder');
+    const bsIndicator = document.getElementById('bs-indicator');
+    const bsLabel     = document.getElementById('bs-label');
+
+    // BS detection — true when running inside a BanterVR browser panel
+    const bsDetected = typeof BS !== 'undefined' && typeof BS.BanterScene !== 'undefined';
+    if (bsDetected) {
+      bsIndicator.classList.add('detected');
+      bsLabel.textContent = 'BS detected — live BanterVR rendering';
+    }
+
+    function render(html) {
+      placeholder.remove();
+      preview.innerHTML = html;
+    }
+
+    function connect() {
+      const ws = new WebSocket(`ws://${location.host}`);
+
+      ws.addEventListener('open', () => {
+        ws.send(JSON.stringify({ type: 'register', role: 'meta-preview' }));
+        status.textContent = 'connected';
+      });
+
+      ws.addEventListener('message', ({ data }) => {
+        const msg = JSON.parse(data);
+        if (msg.type !== 'story-rendered' || !msg.banterUIHtml) return;
+        storyLabel.textContent = `${msg.kind} / ${msg.name}`;
+        render(msg.banterUIHtml);
+      });
+
+      ws.addEventListener('close', () => {
+        status.textContent = 'disconnected — retrying…';
+        setTimeout(connect, 2000);
+      });
+
+      ws.addEventListener('error', () => ws.close());
+    }
+
+    connect();
+  </script>
+</body>
+</html>

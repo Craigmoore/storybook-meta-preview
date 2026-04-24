@@ -17,3 +17,4 @@ coverage/
 .claude.json
 .claude/
 storybook-static/
+certs/
