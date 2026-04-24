@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.9.0] - 2026-04-24
 
 ### Added
 - `bantervr-ui` setup: BanterVR UI Toolkit story library with live in-world preview via WebSocket inject
