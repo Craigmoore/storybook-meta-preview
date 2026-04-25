@@ -110,16 +110,35 @@ yarn dev:audio
 
 ### openbrush
 
+**Mandala**
 ![mandala](docs/screenshots/mandala.png)
+
+**Concentric Circles**
 ![concentric circles](docs/screenshots/concentric%20circles.png)
-![village](docs/screenshots/village.png)
+
+**Sierpinski Triangle**
 ![sierpinski triangle](docs/screenshots/sierpinski%20triangle.png)
+
+**Sierpinski Tri Colour**
 ![sierpinski tri color](docs/screenshots/sierpinski%20tri%20color.png)
+
+**Koch Snowflake**
 ![koch snowflake](docs/screenshots/koch%20snowflake.png)
+
+**Dragon Curve**
 ![dragon curve](docs/screenshots/dragon%20curve.png)
+
+**Double Dragon**
 ![double dragon](docs/screenshots/double%20dragon.png)
+
+**Hilbert Curve**
 ![hilbert curve](docs/screenshots/hilbert%20curve.png)
+
+**Barnsley Fern**
 ![barnsley fern](docs/screenshots/barnsley%20fern.png)
+
+**Village**
+![village](docs/screenshots/village.png)
 
 Open Brush API command stories. Stories generate sequences of brush commands; the Storybook preview renders a 2D canvas preview with oblique projection so 3D strokes have visible depth. The meta-preview auto-sends commands to a running Open Brush instance via its HTTP API whenever a story is selected.
 

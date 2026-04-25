@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- `README.md` — openbrush screenshots labelled and reordered: Mandala and Concentric Circles first, Village last
+
 ## [0.9.3] - 2026-04-25
 
 ### Added
