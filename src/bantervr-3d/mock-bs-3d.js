@@ -133,11 +133,18 @@ export class GameObject {
     this._children   = [];
 
     if (localPosition)    this._group.position.set(localPosition.x, localPosition.y, localPosition.z);
-    if (localEulerAngles) this._group.rotation.set(
-      THREE.MathUtils.degToRad(localEulerAngles.x),
-      THREE.MathUtils.degToRad(localEulerAngles.y),
-      THREE.MathUtils.degToRad(localEulerAngles.z),
-    );
+    if (localEulerAngles) {
+      // Unity uses YXZ Euler order. Match it so the preview behaves identically
+      // to Banter: Y (yaw) is applied first, then X (pitch), then Z (roll).
+      // With XYZ order (Three.js default), the Y rotation has no effect on the
+      // local +Y axis, so azimuth-spread branching appears flat/invisible.
+      this._group.rotation.order = 'YXZ';
+      this._group.rotation.set(
+        THREE.MathUtils.degToRad(localEulerAngles.x),
+        THREE.MathUtils.degToRad(localEulerAngles.y),
+        THREE.MathUtils.degToRad(localEulerAngles.z),
+      );
+    }
     if (localScale) this._group.scale.set(localScale.x, localScale.y, localScale.z);
 
     if (parent instanceof GameObject) {

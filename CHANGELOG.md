@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `BanterVR-3D / Atoms / Primitives` — TorusKnot atom with `side: 'Double'` baked in
+- `BanterVR-3D / Molecules / Fractals` — FractalTree (seeded binary branching tree with depth, branchAngle, spread, lengthDecay, seed controls), SierpinskiTetrahedron (IFS, order 1–3 = 4/16/64 spheres), MengerSponge (IFS, level 1–2 = 20/400 cubes)
+
+### Fixed
+- `mock-bs-3d.js` — Euler rotation order changed from Three.js default XYZ to YXZ to match Unity/Banter; XYZ order caused azimuth rotation to have no effect on local +Y, making all branches point in the same direction and appear invisible edge-on
+- `Fractals.stories.js` — FractalTree branch positions computed in world space rather than via rotated pivot GameObjects; avoids SDK ambiguity about whether `localEulerAngles` is applied at construction time; all branches parented to a root object so the tree moves/destroys as a unit
+
+### Changed
+- `README.md` — added `bantervr-3d` setup section with ports, inject script usage, demo script, and full story list; updated Built With entry for BanterVR to mention 3D
+
 ## [0.10.0] - 2026-04-25
 
 ### Added

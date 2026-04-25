@@ -15,7 +15,7 @@ See `storybookification_summary_v2.md` for the full concept.
 - [Tone.js](https://tonejs.github.io) — Web Audio synthesis and sequencing for the `audio` setup
 - [Tonal.js](https://github.com/tonaljs/tonal) — music theory utilities (notes, chords, scales, progressions) used in `audio` stories
 - [Open Brush](https://openbrush.app) — VR painting application; the `openbrush` setup drives it via its HTTP API
-- [BanterVR](https://bantervr.com) — social VR platform; the `bantervr-ui` setup builds and previews UI panels for Banter worlds ([SDK docs](https://bantervr.com/documentation))
+- [BanterVR](https://bantervr.com) — social VR platform; the `bantervr-ui` setup builds and previews UI panels, and the `bantervr-3d` setup builds and previews 3D objects for Banter worlds ([SDK docs](https://bantervr.com/documentation))
 
 ---
 
@@ -231,6 +231,45 @@ The demo script (`public/bantervr-ui-test.js`) also serves as a reference for al
 **Known limitations:**
 - `backgroundImage` on `UIVisualElement` does not render in BanterVR — Unity UI Toolkit requires a `Sprite`/`Texture2D` asset reference and does not support runtime URLs. Emoji characters are the recommended approach for inline icons.
 
+### bantervr-3d
+
+BanterVR 3D object stories. Stories build 3D scenes using Banter SDK geometry components (`BanterBox`, `BanterSphere`, `BanterCylinder`, `BanterCone`, `BanterTorus`, `BanterTorusKnot`) and `BanterMaterial`. A lightweight Three.js mock renders an approximate preview in Storybook; the inject script reconstructs the full scene graph in-world using the native BS API via WebSocket.
+
+Branch positions and orientations for complex structures are computed in world space and applied directly to individual objects — no cascading rotation through pivot parents, so the scene graph round-trips cleanly through JSON serialisation.
+
+| | |
+|---|---|
+| Storybook | `http://[host]:6012` |
+| Relay | `http://[host]:3339` |
+| Inject / demo (HTTPS) | `https://[host]:33390` |
+
+**Run:**
+```bash
+yarn dev:bantervr-3d
+```
+
+**In-world setup:**
+
+Add the inject script to your Banter world's `index.html`. Position, rotation and scale of the root container are read from the tag attributes:
+
+```html
+<script position="0 1.5 2" rotation="0 0 0" scale="1 1 1"
+        src="https://[host]:33390/meta-preview-bantervr-inject-3d.js"></script>
+```
+
+To verify the 3D pipeline independently of Storybook, load the standalone demo:
+
+```html
+<script src="https://[host]:33390/bantervr-3d-test.js"></script>
+```
+
+The demo script (`public/bantervr-3d-test.js`) is also a reference for all known-good Banter 3D patterns — component order, material application, parent/child hierarchy, physics, and lights — with inline comments explaining each rule.
+
+**Stories:**
+- `BanterVR-3D / Atoms / Primitives` — Box, Sphere, Cylinder, Cone, Torus, TorusKnot; each with colour picker and size range controls
+- `BanterVR-3D / Molecules / Volumes` — all six primitives in a row; TorusKnot uses `side: 'Double'` to avoid backface-culling artefacts
+- `BanterVR-3D / Molecules / Fractals` — FractalTree (seeded binary tree, depth/angle/spread/decay controls), SierpinskiTetrahedron (IFS, order 1–3), MengerSponge (IFS, level 1–2)
+
 ---
 
 ## Installation
@@ -290,7 +329,9 @@ public/
   meta-preview-audio.html            # audio meta-preview (Tone.js player)
   meta-preview-openbrush.html        # openbrush meta-preview (HTTP API sender)
   meta-preview-bantervr-ui.html      # bantervr-ui meta-preview
-  meta-preview-bantervr-inject.js    # self-contained in-world inject script
-  bantervr-ui-test.js                # standalone demo / reference for known-good patterns
+  meta-preview-bantervr-inject.js    # bantervr-ui in-world inject script
+  bantervr-ui-test.js                # bantervr-ui standalone demo / known-good reference
+  meta-preview-bantervr-inject-3d.js # bantervr-3d in-world inject script
+  bantervr-3d-test.js                # bantervr-3d standalone demo / known-good reference
 setups.js                   # registry of all setups and their ports
 ```
