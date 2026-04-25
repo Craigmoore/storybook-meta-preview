@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.9.1] - 2026-04-25
 
 ### Added
 - `src/bantervr-ui/organisms/GameLobby.stories.js` — full-panel organism combining all six element types: title label, status badge (colour-coded by arg), player scroll list, music toggle row, volume slider row, and action button
