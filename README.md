@@ -26,6 +26,8 @@ Each setup is an independent experiment with its own Storybook config, story fil
 
 ### html
 
+![html preview](docs/screenshots/html.png)
+
 The baseline setup. Uses `@storybook/html-webpack5` — stories render plain HTML strings.
 
 | | |
@@ -44,6 +46,8 @@ yarn dev:html
 - `Molecules / Greeting` — composes Hello + World with a live `name` arg control
 
 ### threejs-2d
+
+![threejs-2d preview](docs/screenshots/threejs-2d.png)
 
 Orthographic Three.js scenes. Reference example for the "ThreeJS 2D layout approach". Stories build flat geometry scenes using `PlaneGeometry`, `CircleGeometry` etc. with `MeshBasicMaterial` (no lighting needed). The meta-preview owns a Three.js renderer and rebuilds the scene via `ObjectLoader` on every story change.
 
@@ -64,6 +68,8 @@ yarn dev:threejs-2d
 
 ### threejs-3d
 
+![threejs-3d preview](docs/screenshots/threejs-3d.png)
+
 Perspective Three.js scenes. Reference example for the "ThreeJS 3D component approach". Stories build 3D geometry scenes using `BoxGeometry`, `SphereGeometry` etc. with `MeshStandardMaterial` and default lighting. The meta-preview owns a Three.js perspective renderer with `OrbitControls` and rebuilds the scene via `ObjectLoader` on every story change.
 
 | | |
@@ -83,6 +89,8 @@ yarn dev:threejs-3d
 
 ### audio
 
+![audio preview](docs/screenshots/audio.png)
+
 Structured music data stories. Stories return plain data objects (notes, chords, progressions) — the meta-preview owns the Tone.js engine entirely. Selecting a story updates the meta-preview display; press Play to hear it.
 
 | | |
@@ -101,6 +109,17 @@ yarn dev:audio
 - `Audio / Organisms / Progression` — 9 progressions: Pop Loop, Jazz ii–V–I, Andalusian, Pachelbel, 12-bar Blues, Circle of Fifths, Chromatic Rise, Celtic Melody, Dorian Vamp
 
 ### openbrush
+
+![mandala](docs/screenshots/mandala.png)
+![concentric circles](docs/screenshots/concentric%20circles.png)
+![village](docs/screenshots/village.png)
+![sierpinski triangle](docs/screenshots/sierpinski%20triangle.png)
+![sierpinski tri color](docs/screenshots/sierpinski%20tri%20color.png)
+![koch snowflake](docs/screenshots/koch%20snowflake.png)
+![dragon curve](docs/screenshots/dragon%20curve.png)
+![double dragon](docs/screenshots/double%20dragon.png)
+![hilbert curve](docs/screenshots/hilbert%20curve.png)
+![barnsley fern](docs/screenshots/barnsley%20fern.png)
 
 Open Brush API command stories. Stories generate sequences of brush commands; the Storybook preview renders a 2D canvas preview with oblique projection so 3D strokes have visible depth. The meta-preview auto-sends commands to a running Open Brush instance via its HTTP API whenever a story is selected.
 
@@ -132,9 +151,61 @@ yarn dev:openbrush
 - `OpenBrush / Organisms / Fractals` — SierpinskiTriangle, KochSnowflake, DragonCurve, HilbertCurve, BarnsleyFern, SierpinskiTriColour, DoubleDragon
 - `OpenBrush / Organisms / Village` — full scene: terrain + road network + proximity-placed houses, trees, and rocks
 
+### bantervr-ui
+
+![bantervr-ui preview](docs/screenshots/bantervr-ui.png)
+
+BanterVR UI Toolkit stories. Stories build UI panels using the Banter SDK element types (`UILabel`, `UIButton`, `UISlider`, `UIToggle`, `UIScrollView`, `UIVisualElement`). The Storybook preview renders an approximate HTML version; the inject script reconstructs the real panel in-world via WebSocket.
+
+| | |
+|---|---|
+| Storybook | `http://[host]:6011` |
+| Meta Preview | `http://[host]:3338/meta-preview-bantervr-ui.html` |
+
+**Run:**
+```bash
+yarn dev:bantervr-ui
+```
+
+**In-world setup:**
+
+Add the inject script to your Banter world's `index.html`. It connects to the relay automatically and rebuilds the active story in-world whenever a story is selected:
+
+```html
+<script position="0 1.5 2" rotation="0 180 0" scale="1 1 1"
+        src="http://[host]:3338/meta-preview-bantervr-inject.js"></script>
+```
+
+To verify the panel pipeline is working independently of Storybook, load the standalone demo:
+
+```html
+<script src="http://[host]:3338/bantervr-ui-test.js"></script>
+```
+
+The demo script (`public/bantervr-ui-test.js`) also serves as a reference for all known-good Banter UI patterns — individual padding properties, transparent UILabel background, slider/toggle initialisation sequence, button sizing — with inline comments explaining each rule.
+
+**Stories:**
+- `BanterVR-UI / Atoms / Buttons` — Button (all properties), ConfirmCancel, IconButton
+- `BanterVR-UI / Atoms / Labels` — Label (all properties)
+- `BanterVR-UI / Atoms / Inputs` — Slider, Toggle
+- `BanterVR-UI / Atoms / VisualElement` — VisualElement (all properties), FlexRow, FlexColumn, FlexWrap, Nested
+- `BanterVR-UI / Molecules / ActionCard` — title + description + button
+- `BanterVR-UI / Molecules / ButtonGroup` — IconButton (emoji icon), ImageIconButton (known limitation — see below), ConfirmCancel
+- `BanterVR-UI / Molecules / Labels` — Scoreboard, StatusBadge
+- `BanterVR-UI / Molecules / Sliders` — SliderLabelled, SliderWithRange
+- `BanterVR-UI / Molecules / Toggles` — ToggleLabelled, ToggleGroup
+- `BanterVR-UI / Molecules / ScrollView` — VerticalList, HorizontalList, MixedContent
+- `BanterVR-UI / Molecules / SettingsPanel` — volume slider, brightness slider, music toggle, SFX toggle
+- `BanterVR-UI / Organisms / GameLobby` — full panel: status badge, player scroll list, music toggle, volume slider, action button
+
+**Known limitations:**
+- `backgroundImage` on `UIVisualElement` does not render in BanterVR — Unity UI Toolkit requires a `Sprite`/`Texture2D` asset reference and does not support runtime URLs. Emoji characters are the recommended approach for inline icons.
+
 ---
 
 ## Installation
+
+Requires Node.js 18+ and Yarn classic (1.x).
 
 ```bash
 yarn install
@@ -188,5 +259,8 @@ public/
   meta-preview-threejs-3d.html       # threejs-3d meta-preview (with OrbitControls)
   meta-preview-audio.html            # audio meta-preview (Tone.js player)
   meta-preview-openbrush.html        # openbrush meta-preview (HTTP API sender)
+  meta-preview-bantervr-ui.html      # bantervr-ui meta-preview
+  meta-preview-bantervr-inject.js    # self-contained in-world inject script
+  bantervr-ui-test.js                # standalone demo / reference for known-good patterns
 setups.js                   # registry of all setups and their ports
 ```

@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `docs/screenshots/` — setup screenshots embedded in README: html, threejs-2d, threejs-3d, audio, bantervr-ui, and 10 openbrush renders (mandala, concentric circles, village, Sierpinski variants, Koch snowflake, dragon curve, double dragon, Hilbert curve, Barnsley fern)
+
+### Changed
+- `public/bantervr-ui-test.js` — rewritten as a full reference demo covering all known-good Banter UI patterns: individual padding properties, transparent UILabel background, slider lowValue/highValue/WaitForEndOfFrame sequence, toggle string value, and button without explicit width; inline comments explain the why behind each rule
+- `README.md` — added bantervr-ui setup section with inject script and demo script usage, Node.js/Yarn prerequisites, screenshots for all setups
+
 ## [0.9.2] - 2026-04-25
 
 ### Fixed
