@@ -143,7 +143,6 @@ export const GameLobby = {
     // ── 6. Action button ──────────────────────────────────────────────────────
     const btn = new BS.UIButton();
     btn.SetProperty(BS.PN.text, buttonText);
-    btn.style.width    = '100%';
     btn.style.height   = '48px';
     btn.style.fontSize = '18px';
     panel.root.AppendChild(btn);
