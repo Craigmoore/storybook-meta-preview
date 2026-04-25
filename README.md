@@ -8,6 +8,17 @@ See `storybookification_summary_v2.md` for the full concept.
 
 ---
 
+## Built with
+
+- [Storybook](https://storybook.js.org) — component story framework; provides the manager UI, controls, and preview iframe
+- [Three.js](https://threejs.org) — 3D/2D geometry and rendering for the `threejs-2d`, `threejs-3d`, and `openbrush` setups
+- [Tone.js](https://tonejs.github.io) — Web Audio synthesis and sequencing for the `audio` setup
+- [Tonal.js](https://github.com/tonaljs/tonal) — music theory utilities (notes, chords, scales, progressions) used in `audio` stories
+- [Open Brush](https://openbrush.app) — VR painting application; the `openbrush` setup drives it via its HTTP API
+- [BanterVR](https://bantervr.com) — social VR platform; the `bantervr-ui` setup builds and previews UI panels for Banter worlds ([SDK docs](https://bantervr.com/documentation))
+
+---
+
 ## How it works
 
 ```
