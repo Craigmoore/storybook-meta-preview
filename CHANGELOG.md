@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.10.0] - 2026-04-25
 
 ### Added
 - `bantervr-3d` setup: BanterVR 3D story library with live in-world preview via WebSocket inject
