@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- `GameLobby` — slider height set to `20px` to match toggle row alignment; button width removed so flex-column stretch sizes it correctly in Banter (explicit `width` was causing the 1px border to overflow the content area under Unity's content-box model)
+
 ## [0.9.1] - 2026-04-25
 
 ### Added
