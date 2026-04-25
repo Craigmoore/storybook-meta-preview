@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.9.3] - 2026-04-25
 
 ### Added
 - `docs/screenshots/` — setup screenshots embedded in README: html, threejs-2d, threejs-3d, audio, bantervr-ui, and 10 openbrush renders (mandala, concentric circles, village, Sierpinski variants, Koch snowflake, dragon curve, double dragon, Hilbert curve, Barnsley fern)
