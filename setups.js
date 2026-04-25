@@ -15,4 +15,5 @@ export const setups = {
   'audio':      { storybookPort: 6009, relayPort: 3336 },
   'openbrush':   { storybookPort: 6010, relayPort: 3337 },
   'bantervr-ui': { storybookPort: 6011, relayPort: 3338 },
+  'bantervr-3d': { storybookPort: 6012, relayPort: 3339 },
 };

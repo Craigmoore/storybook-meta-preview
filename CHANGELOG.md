@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `bantervr-3d` setup: BanterVR 3D story library with live in-world preview via WebSocket inject
+- `public/bantervr-3d-test.js` — standalone demo script for verifying 3D object rendering in-world; covers floor+collider, primitives row, parent/child hierarchy, physics box, and point light
+- `public/meta-preview-bantervr-inject-3d.js` — self-contained Banter inject script: reads `position`/`rotation`/`scale` from script tag attributes, connects to relay via WebSocket, reconstructs 3D story scenes using native BS APIs, destroys all previous GameObjects individually on each update, auto-reconnects on disconnect
+- `src/bantervr-3d/mock-bs-3d.js` — browser mock of the BanterVR BS namespace for 3D: `GameObject`, `BanterBox`, `BanterSphere`, `BanterCylinder`, `BanterCone`, `BanterTorus`, `BanterTorusKnot`, `BanterMaterial`, `BanterLight`; maps to Three.js geometry for Storybook preview; `serializeConfig` converts Vector types to arrays for relay transport
+- `src/bantervr-3d/story.js` — `banterVrStory()` helper with OrbitControls, ambient+directional lights, and `hexToVec()` utility
+- Atoms: `Primitives` (Box, Sphere, Cylinder, Cone, Torus) — each with colour picker and size range controls
+- Molecules: `Volumes` — all six primitive types in a row; TorusKnot uses `side: 'Double'` to avoid backface-culling artefacts on inward-facing geometry
+- `docs/setup-bantervr-3d.md` — full setup reference: ports (6012/3339/33390), mock→Three.js mapping, JSON serialisation format, inject script reconstruction pattern, story hierarchy
+- `docs/setup-tui.md` — planning doc for TUI setup (ROT.js preview + xterm.js/Node.js meta-preview)
+- Relay messages for BanterVR-3D stories include `banterVR3DData` (serialised scene graph)
+
 ## [0.9.4] - 2026-04-25
 
 ### Changed

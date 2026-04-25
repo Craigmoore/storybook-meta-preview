@@ -12,10 +12,11 @@ relay.addEventListener('open', () => {
 
 export const decorators = [
   (StoryFn, context) => {
-    window.__metaPreviewScene    = null;
-    window.__metaPreviewData     = null;
-    window.__metaPreviewBrush    = null;
-    window.__metaPreviewBanterUI = null;
+    window.__metaPreviewScene      = null;
+    window.__metaPreviewData       = null;
+    window.__metaPreviewBrush      = null;
+    window.__metaPreviewBanterUI   = null;
+    window.__metaPreviewBanterVR3D = null;
     const result = StoryFn();
 
     requestAnimationFrame(() => {
@@ -58,6 +59,18 @@ export const decorators = [
           brushData: window.__metaPreviewBrush,
         }));
         window.__metaPreviewBrush = null;
+        return;
+      }
+
+      if (window.__metaPreviewBanterVR3D) {
+        relay.send(JSON.stringify({
+          type:          'story-rendered',
+          storyId:       context.id,
+          name:          context.name,
+          kind:          context.kind,
+          banterVR3DData: window.__metaPreviewBanterVR3D.sceneData,
+        }));
+        window.__metaPreviewBanterVR3D = null;
         return;
       }
 

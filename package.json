@@ -31,7 +31,11 @@
     "storybook:bantervr-ui": "STORYBOOK_RELAY_PORT=3338 storybook dev -c .storybook-bantervr-ui -p 6011 --host 0.0.0.0",
     "relay:bantervr-ui": "PORT=3338 node src/relay.js",
     "dev:bantervr-ui": "concurrently \"yarn relay:bantervr-ui\" \"yarn storybook:bantervr-ui\"",
-    "build:bantervr-ui": "storybook build -c .storybook-bantervr-ui"
+    "build:bantervr-ui": "storybook build -c .storybook-bantervr-ui",
+
+    "relay:bantervr-3d": "PORT=3339 node src/relay.js",
+    "storybook:bantervr-3d": "STORYBOOK_RELAY_PORT=3339 storybook dev -c .storybook-bantervr-3d -p 6012 --host 0.0.0.0",
+    "dev:bantervr-3d": "concurrently \"yarn relay:bantervr-3d\" \"yarn storybook:bantervr-3d\""
   },
   "dependencies": {
     "express": "^4.18.2",
