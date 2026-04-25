@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.11.0] - 2026-04-25
 
 ### Added
 - `BanterVR-3D / Atoms / Primitives` — TorusKnot atom with `side: 'Double'` baked in
