@@ -3,6 +3,7 @@ const config = {
   stories: [
     '../src/bantervr-ui/atoms/**/*.stories.js',
     '../src/bantervr-ui/molecules/**/*.stories.js',
+    '../src/bantervr-ui/organisms/**/*.stories.js',
   ],
   addons: ['@storybook/addon-essentials'],
   framework: {
