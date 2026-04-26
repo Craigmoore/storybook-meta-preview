@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.12.1] - 2026-04-26
 
 ### Changed
 - `README.md` — add missing bantervr-3d screenshot
