@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.12.0] - 2026-04-26
 
 ### Added
 - `tui` setup: terminal UI story library with ROT.js Storybook preview and xterm.js meta-preview (`public/meta-preview-tui.html`)
