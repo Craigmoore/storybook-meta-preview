@@ -235,6 +235,8 @@ The demo script (`public/bantervr-ui-test.js`) also serves as a reference for al
 
 ### bantervr-3d
 
+![bantervr-3d preview](docs/screenshots/bantervr-3d.png)
+
 BanterVR 3D object stories. Stories build 3D scenes using Banter SDK geometry components (`BanterBox`, `BanterSphere`, `BanterCylinder`, `BanterCone`, `BanterTorus`, `BanterTorusKnot`) and `BanterMaterial`. A lightweight Three.js mock renders an approximate preview in Storybook; the inject script reconstructs the full scene graph in-world using the native BS API via WebSocket.
 
 Branch positions and orientations for complex structures are computed in world space and applied directly to individual objects — no cascading rotation through pivot parents, so the scene graph round-trips cleanly through JSON serialisation.
