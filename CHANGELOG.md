@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `tui` setup: terminal UI story library with ROT.js Storybook preview and xterm.js meta-preview (`public/meta-preview-tui.html`)
+- `src/tui/story.js` — `tuiStory()` helper and `Grid` class; renders via `ROT.Display` (Storybook) and ANSI escape codes (meta-preview)
+- `src/tui/ansi.js` — `gridToAnsi()` using absolute cursor positioning (`\x1b[y+1;1H`) and true-colour SGR to avoid xterm.js line-spacing artefacts
+- `src/tui/dungeonComponents.js` — shared Angband-style drawing library: palette `C`, tile catalogue `TILES`, atom helpers (`drawStatRow`, `drawStatusBadge`, `drawMessageLine`), molecule helpers (`drawAttributeBlock`, `drawVitalsBlock`, `drawCombatBlock`, `drawEquipmentList`, `drawMessageLog`, `drawCharacterHeader`), organism helper `drawCharacterPanel`
+- `TUI/Atoms/Primitives` — Box, Text, ProgressBar, ColorSwatch, Border at 170×47 default resolution with Terminus font
+- `TUI/Atoms/Dungeon` — TileReference legend, StatRow, StatusBadge, MessageLine
+- `TUI/Molecules/Dungeon` — AttributeBlock, VitalsBlock, CombatBlock, EquipmentList, MessageLog, CharacterHeader
+- `TUI/Organisms` — TmuxLayout (tmux-style split pane), AngbandLevel (procedural dungeon via ROT.js Digger with seed + depth controls), CharacterSheet, TownLevel, InventoryScreen, StoreScreen
+- `src/tui/bloombergComponents.js` — Bloomberg Terminal drawing library: amber-on-black palette, `priceHistory()` seeded PRNG, atoms (`drawBloombergHeader`, `drawSparkline`, `drawFnKeyBar`, `drawPriceChart`), molecules (`drawQuoteHeader`, `drawKeyStats`, `drawOrderBook`, `drawNewsHeadlines`, `drawMarketRow`)
+- `src/tui/htopComponents.js` — htop drawing library: `drawCpuBar`, `drawMemBar`, `drawProcessHeader`, `drawProcessRow`, `drawCpuGrid`, `drawMemoryPanel`, `drawTaskSummary`, `drawProcessList`, `generateProcesses`
+- `TUI/Atoms/Bloomberg` — PriceTick, Sparkline, FunctionKeyBar, SectionLabel
+- `TUI/Atoms/Htop` — CpuBar, MemBar, ProcessRow
+- `TUI/Molecules/Bloomberg` — QuoteHeader, KeyStatistics, OrderBook, NewsHeadlines, MarketRow, MiniChart
+- `TUI/Molecules/Htop` — CpuGrid, MemoryPanel, TaskSummary, ProcessTable
+- `TUI/Organisms` — Bloomberg EQS (equity summary with chart + order book), Bloomberg WMQ (world market monitor), Bloomberg GP (full-screen price chart), htop System Monitor
+
 ## [0.11.0] - 2026-04-25
 
 ### Added

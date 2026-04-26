@@ -7,38 +7,37 @@
     "relay:html": "PORT=3333 node src/relay.js",
     "dev:html": "concurrently \"yarn relay:html\" \"yarn storybook:html\"",
     "build:html": "storybook build -c .storybook-html",
-
     "storybook:threejs-2d": "STORYBOOK_RELAY_PORT=3334 storybook dev -c .storybook-threejs-2d -p 6007 --host 0.0.0.0",
     "relay:threejs-2d": "PORT=3334 node src/relay.js",
     "dev:threejs-2d": "concurrently \"yarn relay:threejs-2d\" \"yarn storybook:threejs-2d\"",
     "build:threejs-2d": "storybook build -c .storybook-threejs-2d",
-
     "storybook:threejs-3d": "STORYBOOK_RELAY_PORT=3335 storybook dev -c .storybook-threejs-3d -p 6008 --host 0.0.0.0",
     "relay:threejs-3d": "PORT=3335 node src/relay.js",
     "dev:threejs-3d": "concurrently \"yarn relay:threejs-3d\" \"yarn storybook:threejs-3d\"",
     "build:threejs-3d": "storybook build -c .storybook-threejs-3d",
-
     "storybook:audio": "STORYBOOK_RELAY_PORT=3336 storybook dev -c .storybook-audio -p 6009 --host 0.0.0.0",
     "relay:audio": "PORT=3336 node src/relay.js",
     "dev:audio": "concurrently \"yarn relay:audio\" \"yarn storybook:audio\"",
     "build:audio": "storybook build -c .storybook-audio",
-
     "storybook:openbrush": "STORYBOOK_RELAY_PORT=3337 storybook dev -c .storybook-openbrush -p 6010 --host 0.0.0.0",
     "relay:openbrush": "PORT=3337 node src/relay.js",
     "dev:openbrush": "concurrently \"yarn relay:openbrush\" \"yarn storybook:openbrush\"",
     "build:openbrush": "storybook build -c .storybook-openbrush",
-
     "storybook:bantervr-ui": "STORYBOOK_RELAY_PORT=3338 storybook dev -c .storybook-bantervr-ui -p 6011 --host 0.0.0.0",
     "relay:bantervr-ui": "PORT=3338 node src/relay.js",
     "dev:bantervr-ui": "concurrently \"yarn relay:bantervr-ui\" \"yarn storybook:bantervr-ui\"",
     "build:bantervr-ui": "storybook build -c .storybook-bantervr-ui",
-
     "relay:bantervr-3d": "PORT=3339 node src/relay.js",
     "storybook:bantervr-3d": "STORYBOOK_RELAY_PORT=3339 storybook dev -c .storybook-bantervr-3d -p 6012 --host 0.0.0.0",
-    "dev:bantervr-3d": "concurrently \"yarn relay:bantervr-3d\" \"yarn storybook:bantervr-3d\""
+    "dev:bantervr-3d": "concurrently \"yarn relay:bantervr-3d\" \"yarn storybook:bantervr-3d\"",
+
+    "relay:tui": "PORT=3340 node src/relay.js",
+    "storybook:tui": "STORYBOOK_RELAY_PORT=3340 storybook dev -c .storybook-tui -p 6013 --host 0.0.0.0",
+    "dev:tui": "concurrently \"yarn relay:tui\" \"yarn storybook:tui\""
   },
   "dependencies": {
     "express": "^4.18.2",
+    "rot-js": "^2.2.1",
     "three": "^0.170.0",
     "ws": "^8.18.0"
   },

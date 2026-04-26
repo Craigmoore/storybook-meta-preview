@@ -6,17 +6,32 @@
 const relayPort = process.env.STORYBOOK_RELAY_PORT ?? '3333';
 const relay     = new WebSocket(`ws://${location.hostname}:${relayPort}`);
 
+let currentStoryId = null;
+
 relay.addEventListener('open', () => {
   relay.send(JSON.stringify({ type: 'register', role: 'storybook-channel' }));
 });
 
+relay.addEventListener('message', (event) => {
+  let msg;
+  try { msg = JSON.parse(event.data); } catch { return; }
+  if (msg.type === 'tui-resize' && currentStoryId) {
+    const channel = window.__STORYBOOK_ADDONS_CHANNEL__;
+    if (channel) {
+      channel.emit('updateStoryArgs', { storyId: currentStoryId, updatedArgs: { cols: msg.cols, rows: msg.rows } });
+    }
+  }
+});
+
 export const decorators = [
   (StoryFn, context) => {
+    currentStoryId                 = context.id;
     window.__metaPreviewScene      = null;
     window.__metaPreviewData       = null;
     window.__metaPreviewBrush      = null;
     window.__metaPreviewBanterUI   = null;
     window.__metaPreviewBanterVR3D = null;
+    window.__metaPreviewTUI        = null;
     const result = StoryFn();
 
     requestAnimationFrame(() => {
@@ -71,6 +86,18 @@ export const decorators = [
           banterVR3DData: window.__metaPreviewBanterVR3D.sceneData,
         }));
         window.__metaPreviewBanterVR3D = null;
+        return;
+      }
+
+      if (window.__metaPreviewTUI) {
+        relay.send(JSON.stringify({
+          type:    'story-rendered',
+          storyId: context.id,
+          name:    context.name,
+          kind:    context.kind,
+          tuiData: window.__metaPreviewTUI,
+        }));
+        window.__metaPreviewTUI = null;
         return;
       }
 

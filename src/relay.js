@@ -35,7 +35,19 @@ function handleConnection(ws) {
     if (msg.type === 'story-rendered' && ws.role === 'storybook-channel') {
       const payload = JSON.stringify(msg);
       for (const client of clients) {
-        if ((client.role === 'meta-preview' || client.role === 'banter-inject') && client.readyState === WebSocket.OPEN) {
+        if (
+          (client.role === 'meta-preview' || client.role === 'banter-inject' || client.role === 'tui-preview')
+          && client.readyState === WebSocket.OPEN
+        ) {
+          client.send(payload);
+        }
+      }
+    }
+
+    if (msg.type === 'resize' && ws.role === 'tui-preview') {
+      const payload = JSON.stringify({ type: 'tui-resize', cols: msg.cols, rows: msg.rows });
+      for (const client of clients) {
+        if (client.role === 'storybook-channel' && client.readyState === WebSocket.OPEN) {
           client.send(payload);
         }
       }

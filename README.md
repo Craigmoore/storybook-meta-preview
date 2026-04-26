@@ -16,6 +16,8 @@ See `storybookification_summary_v2.md` for the full concept.
 - [Tonal.js](https://github.com/tonaljs/tonal) — music theory utilities (notes, chords, scales, progressions) used in `audio` stories
 - [Open Brush](https://openbrush.app) — VR painting application; the `openbrush` setup drives it via its HTTP API
 - [BanterVR](https://bantervr.com) — social VR platform; the `bantervr-ui` setup builds and previews UI panels, and the `bantervr-3d` setup builds and previews 3D objects for Banter worlds ([SDK docs](https://bantervr.com/documentation))
+- [ROT.js](https://ondras.github.io/rot.js/hp/) — roguelike toolkit; used in the `tui` setup for dungeon map generation (`Map.Digger`) and the `ROT.Display` canvas renderer in Storybook preview
+- [xterm.js](https://xtermjs.org) — browser terminal emulator; used in the `tui` meta-preview to render ANSI escape sequences from the story grid
 
 ---
 
@@ -270,6 +272,63 @@ The demo script (`public/bantervr-3d-test.js`) is also a reference for all known
 - `BanterVR-3D / Molecules / Volumes` — all six primitives in a row; TorusKnot uses `side: 'Double'` to avoid backface-culling artefacts
 - `BanterVR-3D / Molecules / Fractals` — FractalTree (seeded binary tree, depth/angle/spread/decay controls), SierpinskiTetrahedron (IFS, order 1–3), MengerSponge (IFS, level 1–2)
 
+### tui
+
+**Tmux Layout**
+![tmux](docs/screenshots/tmux.png)
+
+**Angband Level**
+![angband level](docs/screenshots/angband-level.png)
+
+**Angband Character Sheet**
+![angband character](docs/screenshots/angband-character.png)
+
+**Angband Town**
+![angband town](docs/screenshots/angband-town.png)
+
+**Bloomberg Equity Summary**
+![bloomberg equity summary](docs/screenshots/bloomberg-equity%20summary.png)
+
+**Bloomberg World Market Monitor**
+![bloomberg world market monitor](docs/screenshots/bloomberg-world%20market%20monitor.png)
+
+**Bloomberg Price Chart**
+![bloomberg price chart](docs/screenshots/bloomberg-price%20chart.png)
+
+**htop System Monitor**
+![htop](docs/screenshots/htop.png)
+
+Terminal UI stories. Stories write to a character grid (`Grid` class) using drawing primitives from shared component libraries. The Storybook preview renders via `ROT.Display` (canvas, Terminus font); the meta-preview renders the same grid as ANSI true-colour escape sequences in an xterm.js terminal. Both previews are driven entirely by story args — no auto-resize or layout inference.
+
+| | |
+|---|---|
+| Storybook | `http://[host]:6013` |
+| Meta Preview | `http://[host]:3340/meta-preview-tui.html` |
+
+**Run:**
+```bash
+yarn dev:tui
+```
+
+**Stories:**
+
+*Atoms*
+- `TUI / Atoms / Primitives` — Box, Text, ProgressBar, ColorSwatch, Border (170×47 default, Terminus font)
+- `TUI / Atoms / Dungeon` — TileReference (terrain/creature/item legend), StatRow, StatusBadge, MessageLine
+- `TUI / Atoms / Bloomberg` — PriceTick (price + directional arrow), Sparkline (block-char `▁▂▃▄▅▆▇█`), FunctionKeyBar, SectionLabel
+- `TUI / Atoms / Htop` — CpuBar (colored `|` fill by user/kernel/nice/iowait), MemBar, ProcessRow
+
+*Molecules*
+- `TUI / Molecules / Dungeon` — AttributeBlock, VitalsBlock, CombatBlock, EquipmentList, MessageLog, CharacterHeader
+- `TUI / Molecules / Bloomberg` — QuoteHeader, KeyStatistics, OrderBook, NewsHeadlines, MarketRow, MiniChart
+- `TUI / Molecules / Htop` — CpuGrid, MemoryPanel, TaskSummary, ProcessTable
+
+*Organisms*
+- `TUI / Organisms / Shell` — TmuxLayout (multi-pane terminal with status bar)
+- `TUI / Organisms / Angband` — AngbandLevel (procedural dungeon, seed + depth controls), CharacterSheet, TownLevel, InventoryScreen, StoreScreen
+- `TUI / Organisms / Bloomberg` — Equity Summary (EQS: key stats / intraday chart / order book), World Market Monitor (WMQ: Americas, Europe, Asia-Pacific, Commodities, Fixed Income), Price Chart (GP: full-screen ASCII line chart with period selector)
+- `TUI / Organisms / Htop` — System Monitor (CPU grid, Mem/Swap bars, task summary, process table; all driven by seed + live controls)
+
 ---
 
 ## Installation
@@ -322,6 +381,15 @@ src/
     story.js                # openbrushStory() helper — canvas preview with oblique projection
     molecules/
       structures.js         # makeTerrain, makeRoadNetwork, makeTree, makeRock, makeScene
+  tui/
+    story.js                # tuiStory() helper + Grid class (put/fill/text/get)
+    ansi.js                 # gridToAnsi() — absolute cursor positioning, true-colour SGR
+    dungeonComponents.js    # Angband drawing library: palette C, TILES, atoms, molecules, drawCharacterPanel
+    bloombergComponents.js  # Bloomberg drawing library: palette BC, priceHistory(), drawPriceChart(), atoms, molecules
+    htopComponents.js       # htop drawing library: palette HC, drawCpuBar(), drawMemBar(), process table, generateProcesses()
+    atoms/
+    molecules/
+    organisms/
 public/
   meta-preview.html                  # html setup meta-preview
   meta-preview-threejs-2d.html       # threejs-2d meta-preview
@@ -333,5 +401,6 @@ public/
   bantervr-ui-test.js                # bantervr-ui standalone demo / known-good reference
   meta-preview-bantervr-inject-3d.js # bantervr-3d in-world inject script
   bantervr-3d-test.js                # bantervr-3d standalone demo / known-good reference
+  meta-preview-tui.html              # tui meta-preview (xterm.js terminal, ANSI rendering)
 setups.js                   # registry of all setups and their ports
 ```
