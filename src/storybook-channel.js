@@ -32,6 +32,7 @@ export const decorators = [
     window.__metaPreviewBanterUI   = null;
     window.__metaPreviewBanterVR3D = null;
     window.__metaPreviewTUI        = null;
+    window.__metaPreviewSDF2D      = null;
     const result = StoryFn();
 
     requestAnimationFrame(() => {
@@ -98,6 +99,18 @@ export const decorators = [
           tuiData: window.__metaPreviewTUI,
         }));
         window.__metaPreviewTUI = null;
+        return;
+      }
+
+      if (window.__metaPreviewSDF2D) {
+        relay.send(JSON.stringify({
+          type:     'story-rendered',
+          storyId:  context.id,
+          name:     context.name,
+          kind:     context.kind,
+          sdf2dData: window.__metaPreviewSDF2D,
+        }));
+        window.__metaPreviewSDF2D = null;
         return;
       }
 

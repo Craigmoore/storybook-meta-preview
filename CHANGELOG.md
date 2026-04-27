@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `sdf2d` setup: SDF2D story library — stories define GLSL signed-distance scenes; both Storybook preview and meta-preview render via WebGL2
+- `src/sdf2d/primitives.js` — GLSL primitive library: `sdCircle`, `sdBox`, `sdRoundedBox`, `sdCapsule`, `sdEquilateralTriangle`, `sdPentagon`, `sdHexagon`, `sdOctagon`, `sdStar5`, `sdArc`, `sdPie`, `sdRing`, `sdCross`, `sdHeart`, `sdMoon`, `sdVesica`, `sdEgg`; boolean ops (`opUnion`, `opIntersect`, `opSubtract`, smooth variants); domain ops (`opRotate`, `opMirrorX/Y`, `opMirror`, `opRepeat`, `opRepeatPolar`); colorize helpers (`colField`, `colFill`, `colOutline`, `colGradient`)
+- `src/sdf2d/canvas.js` — `sdfCanvas(fragSrc, opts)` WebGL2 helper: compiles and links shader, handles animation loop via `requestAnimationFrame`, cleans up on disconnect
+- `src/sdf2d/story.js` — `sdfStory(sceneSrc, opts)` helper: assembles full fragment shader from GLSL scene body, renders in Storybook preview, and packages shader for relay transport via `window.__metaPreviewSDF2D`; `col()` and `displayArgType` utilities
+- `public/meta-preview-sdf2d.html` — standalone WebGL2 SDF renderer: receives `sdf2dData` from relay, compiles and runs the shader, supports animated shaders via `u_time` uniform
+- `SDF2D/Atoms/Shapes` — Circle, Box (with Rounded variant), Capsule, Triangle, Pentagon, Hexagon, Octagon, Star, Arc, Pie, Ring, Cross, Heart, Moon, Vesica, Egg — all with `display` control (field / fill / outline)
+- `SDF2D/Molecules/CSG` — Union, Intersect, Subtract, SmoothUnion, SmoothIntersect, SmoothSubtract (each with separation + shape size controls)
+- `SDF2D/Molecules/Domain` — Flower (polar repeat of rounded petal), Starburst (polar repeat capsule rays), Shells (onion layers via abs(d)−t)
+- `SDF2D/Molecules/Operations` — Lens, Crescent, SmoothScoop, SmoothIntersect, WireframeTriangle, RingLattice
+- `SDF2D/Organisms/Compositions` — SmoothBlob, Dumbbell, Wings, Tile (tiled ring+cross motif), Kaleidoscope (mirror + polar repeat + smooth union)
+- `SDF2D/Organisms/Fractals` — KochSnowflake (JS subdivision, iter 0–3), Sierpinski (GLSL IFS nearest-vertex, iter 1–8), SierpinskiCarpet (GLSL mod-based, iter 1–6), DragonCurve (JS IFS turn-sequence, iter 1–12), LevyCCurve (JS recursive subdivision, iter 1–12), FractalTree (JS binary branching, depth 1–6)
+
 ## [0.12.1] - 2026-04-26
 
 ### Changed

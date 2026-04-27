@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Meta Preview — SDF2D</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; background: #0d0d12; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    canvas { display: block; max-width: 100vmin; max-height: 100vmin; width: 100vmin; height: 100vmin; }
+    #status { position: fixed; top: 8px; right: 12px; font: 11px monospace; color: #333; pointer-events: none; }
+    #label  { position: fixed; top: 8px; left:  12px; font: 11px monospace; color: #333; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <div id="status">connecting…</div>
+  <div id="label"></div>
+
+  <script>
+    const status = document.getElementById('status');
+    const label  = document.getElementById('label');
+
+    // ── WebGL canvas ──────────────────────────────────────────────────────────
+
+    const VERT = `#version 300 es
+in vec2 a_pos;
+void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }
+`;
+
+    let canvas  = null;
+    let rafId   = null;
+
+    function stopCurrent() {
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+      if (canvas) canvas.remove();
+      canvas = null;
+    }
+
+    function runShader({ fragSrc, animate, size }) {
+      stopCurrent();
+
+      canvas = document.createElement('canvas');
+      canvas.width  = size;
+      canvas.height = size;
+      document.body.appendChild(canvas);
+
+      const gl = canvas.getContext('webgl2');
+      if (!gl) { status.textContent = 'WebGL2 unavailable'; return; }
+
+      const compile = (type, src) => {
+        const s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+          console.error('Shader error:\n' + gl.getShaderInfoLog(s));
+          return null;
+        }
+        return s;
+      };
+
+      const vert = compile(gl.VERTEX_SHADER,   VERT);
+      const frag = compile(gl.FRAGMENT_SHADER, fragSrc);
+      if (!vert || !frag) { status.textContent = 'shader error (see console)'; return; }
+
+      const prog = gl.createProgram();
+      gl.attachShader(prog, vert);
+      gl.attachShader(prog, frag);
+      gl.linkProgram(prog);
+
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+
+      const posLoc  = gl.getAttribLocation(prog,  'a_pos');
+      const resLoc  = gl.getUniformLocation(prog,  'u_res');
+      const timeLoc = gl.getUniformLocation(prog,  'u_time');
+
+      gl.useProgram(prog);
+      gl.enableVertexAttribArray(posLoc);
+      gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+      gl.uniform2f(resLoc, size, size);
+
+      let t0 = null;
+      const draw = (ts) => {
+        if (t0 === null) t0 = ts;
+        gl.uniform1f(timeLoc, (ts - t0) * 0.001);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        if (animate) rafId = requestAnimationFrame(draw);
+      };
+
+      if (animate) {
+        rafId = requestAnimationFrame(draw);
+      } else {
+        gl.uniform1f(timeLoc, 0.0);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      }
+    }
+
+    // ── WebSocket ─────────────────────────────────────────────────────────────
+
+    const port = location.port || 3341;
+    const wsUrl = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.hostname}:${port}`;
+
+    function connect() {
+      const ws = new WebSocket(wsUrl);
+
+      ws.addEventListener('open', () => {
+        ws.send(JSON.stringify({ type: 'register', role: 'sdf2d-preview' }));
+        status.textContent = 'connected';
+      });
+
+      ws.addEventListener('message', (ev) => {
+        let msg;
+        try { msg = JSON.parse(ev.data); } catch { return; }
+        if (msg.type !== 'story-rendered' || !msg.sdf2dData) return;
+
+        label.textContent = `${msg.kind} / ${msg.name}`;
+        runShader(msg.sdf2dData);
+      });
+
+      ws.addEventListener('close', () => {
+        status.textContent = 'disconnected — reconnecting…';
+        stopCurrent();
+        setTimeout(connect, 2000);
+      });
+
+      ws.addEventListener('error', () => ws.close());
+    }
+
+    connect();
+  </script>
+</body>
+</html>

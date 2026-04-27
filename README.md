@@ -331,6 +331,33 @@ yarn dev:tui
 - `TUI / Organisms / Bloomberg` — Equity Summary (EQS: key stats / intraday chart / order book), World Market Monitor (WMQ: Americas, Europe, Asia-Pacific, Commodities, Fixed Income), Price Chart (GP: full-screen ASCII line chart with period selector)
 - `TUI / Organisms / Htop` — System Monitor (CPU grid, Mem/Swap bars, task summary, process table; all driven by seed + live controls)
 
+### sdf2d
+
+SDF2D stories define a GLSL `vec3 render(vec2 p)` function using signed-distance field primitives and operations from the shared primitive library. Both the Storybook preview and the meta-preview render the scene as a full-resolution WebGL2 fragment shader — no serialisation of geometry, just the shader source itself.
+
+| | |
+|---|---|
+| Storybook | `http://[host]:6014` |
+| Meta Preview | `http://[host]:3341/meta-preview-sdf2d.html` |
+
+**Run:**
+```bash
+yarn dev:sdf2d
+```
+
+**Stories:**
+
+*Atoms*
+- `SDF2D / Atoms / Shapes` — Circle, Box (plain and rounded), Capsule, Triangle, Pentagon, Hexagon, Octagon, Star, Arc, Pie, Ring, Cross, Heart, Moon, Vesica, Egg — each with `display` control: `field` (IQ distance-field visualization), `fill` (antialiased solid), `outline` (fill with stroke)
+
+*Molecules*
+- `SDF2D / Molecules / CSG` — Union, Intersect, Subtract, SmoothUnion, SmoothIntersect, SmoothSubtract — each with separation and shape-size sliders to expose the operation boundary
+- `SDF2D / Molecules / Domain` — Flower (polar-repeat petal), Starburst (polar-repeat capsule rays with punched centre), Shells (onion layers via `abs(d) − t`)
+- `SDF2D / Molecules / Operations` — Lens, Crescent, SmoothScoop, SmoothIntersect, WireframeTriangle (three capsule edges), RingLattice (grid-repeat ring with punched spot)
+
+*Organisms*
+- `SDF2D / Organisms / Compositions` — SmoothBlob (four circles smooth-unioned), Dumbbell (capsule bar + end spheres), Wings (mirror + rotate + union), Tile (grid-repeat ring+cross motif), Kaleidoscope (mirror + polar repeat + smooth union + centre punch)
+
 ---
 
 ## Installation
@@ -392,6 +419,13 @@ src/
     atoms/
     molecules/
     organisms/
+  sdf2d/
+    primitives.js           # GLSL SDF primitive library (shapes, boolean ops, domain ops, colorize helpers)
+    canvas.js               # sdfCanvas() — WebGL2 compile/link/animate helper
+    story.js                # sdfStory() — assembles full frag shader, renders in Storybook, packages for relay; col(), displayArgType
+    atoms/
+    molecules/
+    organisms/
 public/
   meta-preview.html                  # html setup meta-preview
   meta-preview-threejs-2d.html       # threejs-2d meta-preview
@@ -404,5 +438,6 @@ public/
   meta-preview-bantervr-inject-3d.js # bantervr-3d in-world inject script
   bantervr-3d-test.js                # bantervr-3d standalone demo / known-good reference
   meta-preview-tui.html              # tui meta-preview (xterm.js terminal, ANSI rendering)
+  meta-preview-sdf2d.html            # sdf2d meta-preview (WebGL2 fragment shader renderer)
 setups.js                   # registry of all setups and their ports
 ```

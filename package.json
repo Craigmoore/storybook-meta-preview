@@ -33,7 +33,10 @@
 
     "relay:tui": "PORT=3340 node src/relay.js",
     "storybook:tui": "STORYBOOK_RELAY_PORT=3340 storybook dev -c .storybook-tui -p 6013 --host 0.0.0.0",
-    "dev:tui": "concurrently \"yarn relay:tui\" \"yarn storybook:tui\""
+    "dev:tui": "concurrently \"yarn relay:tui\" \"yarn storybook:tui\"",
+    "relay:sdf2d": "PORT=3341 node src/relay.js",
+    "storybook:sdf2d": "STORYBOOK_RELAY_PORT=3341 storybook dev -c .storybook-sdf2d -p 6014 --host 0.0.0.0",
+    "dev:sdf2d": "concurrently \"yarn relay:sdf2d\" \"yarn storybook:sdf2d\""
   },
   "dependencies": {
     "express": "^4.18.2",

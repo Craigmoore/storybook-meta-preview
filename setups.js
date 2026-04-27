@@ -17,4 +17,5 @@ export const setups = {
   'bantervr-ui': { storybookPort: 6011, relayPort: 3338 },
   'bantervr-3d': { storybookPort: 6012, relayPort: 3339 },
   'tui':         { storybookPort: 6013, relayPort: 3340 },
+  'sdf2d':       { storybookPort: 6014, relayPort: 3341 },
 };
