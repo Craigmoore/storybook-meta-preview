@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.13.0] - 2026-04-27
 
 ### Added
 - `sdf2d` setup: SDF2D story library — stories define GLSL signed-distance scenes; both Storybook preview and meta-preview render via WebGL2
