@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.13.1] - 2026-04-27
 
 ### Added
 - `SDF2D/Organisms/Fractals/RoadNetwork` — seeded procedural branching road network; LCG drives per-segment angle deviation, length variation, and branching decisions; roads rendered as `sdCapsule` union with `sdCircle` junction nodes; controls: seed (0–9999), depth (2–7), roadWidth, spread
