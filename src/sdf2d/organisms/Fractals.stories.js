@@ -5,6 +5,85 @@ export default { title: 'SDF2D/Organisms/Fractals' };
 const display = { display: 'field' };
 const displayType = { display: displayArgType };
 
+// ── Road Network ─────────────────────────────────────────────────────────────
+// Seeded procedural road network. An LCG drives per-segment angle deviation,
+// length variation, and branching decisions so the same seed always produces
+// the same layout. Roads → sdCapsule; junction nodes → sdCircle (slightly wider
+// than the road) to smooth out joins. All geometry inlined as GLSL literals.
+export const RoadNetwork = {
+  args: { seed: 42, depth: 5, roadWidth: 0.020, spread: 40, ...display },
+  argTypes: {
+    seed:      { control: { type: 'range', min: 0,     max: 9999,  step: 1 } },
+    depth:     { control: { type: 'range', min: 2,     max: 7,     step: 1 } },
+    roadWidth: { control: { type: 'range', min: 0.008, max: 0.040, step: 0.001 } },
+    spread:    { control: { type: 'range', min: 10,    max: 70,    step: 5 } },
+    ...displayType,
+  },
+  render: ({ seed, depth, roadWidth, spread, display }) => {
+    let s = seed | 0;
+    const rand = () => {
+      s = (Math.imul(s, 1664525) + 1013904223) | 0;
+      return (s >>> 0) / 0x100000000;
+    };
+
+    const segs = [], junctions = [];
+
+    const grow = (x, y, angle, len, d) => {
+      if (d <= 0 || len < 0.04) return;
+      const a   = angle + (rand() - 0.5) * spread * Math.PI / 180;
+      const seg = len * (0.65 + rand() * 0.55);
+      const tx  = x + Math.cos(a) * seg;
+      const ty  = y + Math.sin(a) * seg;
+      if (Math.abs(tx) > 0.50 || Math.abs(ty) > 0.50) return;
+      segs.push([x, y, tx, ty]);
+      junctions.push([tx, ty]);
+      const r = rand();
+      if (r < 0.12) {
+        // dead end
+      } else if (r < 0.45 || d <= 1) {
+        grow(tx, ty, a, len * 0.82, d - 1);
+      } else {
+        const ba   = (25 + rand() * 45) * Math.PI / 180;
+        const side = rand() > 0.5 ? 1 : -1;
+        grow(tx, ty, a + ba * side, len * 0.78, d - 1);
+        if (rand() > 0.35) {
+          grow(tx, ty, a - ba * side, len * 0.72, d - 1);
+        } else {
+          grow(tx, ty, a + (rand() - 0.5) * 0.4, len * 0.80, d - 1);
+        }
+      }
+    };
+
+    const rootCount = 3 + (rand() * 2 | 0);
+    for (let i = 0; i < rootCount; i++) {
+      grow(0, 0, (i / rootCount) * Math.PI * 2 + (rand() - 0.5) * 0.6, 0.28, depth);
+    }
+    junctions.push([0, 0]);
+
+    const rw = roadWidth.toFixed(4);
+    const jr = (roadWidth * 1.35).toFixed(4);
+    const f  = v => v.toFixed(5);
+    const decls = [
+      ...segs.map((s, i) =>
+        `float s${i} = sdCapsule(p, vec2(${f(s[0])},${f(s[1])}), vec2(${f(s[2])},${f(s[3])}), ${rw});`),
+      ...junctions.map((j, i) =>
+        `float j${i} = sdCircle(p - vec2(${f(j[0])},${f(j[1])}), ${jr});`),
+    ];
+    const names = [...segs.map((_, i) => `s${i}`), ...junctions.map((_, i) => `j${i}`)];
+    const union = names.length === 0
+      ? 'float d = 1.0;'
+      : ['float d = ' + names[0] + ';', ...names.slice(1).map(n => `d = opUnion(d, ${n});`)].join('\n        ');
+
+    return sdfStory(`
+      vec3 render(vec2 p) {
+        ${decls.join('\n        ')}
+        ${union}
+        return ${col(display)};
+      }
+    `);
+  },
+};
+
 // ── Koch Snowflake ────────────────────────────────────────────────────────────
 // JS subdivides segments: each edge → 4 (keep outer thirds, replace middle with
 // equilateral bump). CCW triangle + rotate(−60°) = outward bumps. At iter N,
