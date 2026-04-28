@@ -1,4 +1,5 @@
 import { PRIMITIVES } from './primitives.js';
+import { MOLECULES } from './molecules-lib.js';
 import { sdfCanvas } from './canvas.js';
 
 const HEADER = `#version 300 es
@@ -18,7 +19,7 @@ void main() {
 // Assembles a full fragment shader from scene GLSL and creates a canvas.
 // sceneSrc must define: vec3 render(vec2 p)
 export function sdfStory(sceneSrc, opts = {}) {
-  const fragSrc = HEADER + PRIMITIVES + sceneSrc + FOOTER;
+  const fragSrc = HEADER + PRIMITIVES + MOLECULES + sceneSrc + FOOTER;
   window.__metaPreviewSDF2D = { fragSrc, animate: opts.animate ?? false, size: opts.size ?? 512 };
   return sdfCanvas(fragSrc, opts);
 }

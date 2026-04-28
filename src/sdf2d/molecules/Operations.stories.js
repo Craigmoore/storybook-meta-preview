@@ -17,9 +17,7 @@ export const Lens = {
     const r = radius.toFixed(4), s = separation.toFixed(4);
     return sdfStory(`
       vec3 render(vec2 p) {
-        float a = sdCircle(p - vec2(-${s}, 0.0), ${r});
-        float b = sdCircle(p - vec2( ${s}, 0.0), ${r});
-        float d = opIntersect(a, b);
+        float d = molLens(p, ${r}, ${s});
         return ${col(display)};
       }
     `);
@@ -27,7 +25,6 @@ export const Lens = {
 };
 
 // ── Crescent ──────────────────────────────────────────────────────────────────
-// opSubtract then opMirrorX — one operation concept shown with symmetry.
 export const Crescent = {
   args: { outerRadius: 0.38, innerRadius: 0.32, offset: 0.18, ...display },
   argTypes: {
@@ -40,8 +37,7 @@ export const Crescent = {
     const ro = outerRadius.toFixed(4), ri = innerRadius.toFixed(4), o = offset.toFixed(4);
     return sdfStory(`
       vec3 render(vec2 p) {
-        vec2  mp = opMirrorX(p) - vec2(${o}, 0.0);
-        float d  = opSubtract(sdCircle(mp, ${ro}), sdCircle(mp - vec2(${o}, 0.0), ${ri}));
+        float d = molCrescent(p, ${ro}, ${ri}, ${o});
         return ${col(display)};
       }
     `);
@@ -49,7 +45,6 @@ export const Crescent = {
 };
 
 // ── Smooth Scoop ──────────────────────────────────────────────────────────────
-// opSmoothSubtract carves a soft-edged bite out of a rounded rectangle.
 export const SmoothScoop = {
   args: { k: 0.08, scoopOffset: 0.28, scoopRadius: 0.32, ...display },
   argTypes: {
@@ -62,9 +57,7 @@ export const SmoothScoop = {
     const kv = k.toFixed(4), so = scoopOffset.toFixed(4), sr = scoopRadius.toFixed(4);
     return sdfStory(`
       vec3 render(vec2 p) {
-        float shape = sdRoundedBox(p, vec2(0.38, 0.28), 0.06);
-        float scoop = sdCircle(p - vec2(0.0, ${so}), ${sr});
-        float d = opSmoothSubtract(shape, scoop, ${kv});
+        float d = molSmoothScoop(p, ${so}, ${sr}, ${kv});
         return ${col(display)};
       }
     `);
@@ -72,8 +65,6 @@ export const SmoothScoop = {
 };
 
 // ── Smooth Intersect ──────────────────────────────────────────────────────────
-// Box ∩ Circle with smooth blending. k=0 is a crisp rounded square; higher k
-// inflates and pillows the corners.
 export const SmoothIntersect = {
   args: { k: 0.08, boxSize: 0.42, circleRadius: 0.44, ...display },
   argTypes: {
@@ -86,7 +77,7 @@ export const SmoothIntersect = {
     const kv = k.toFixed(4), bs = boxSize.toFixed(4), cr = circleRadius.toFixed(4);
     return sdfStory(`
       vec3 render(vec2 p) {
-        float d = opSmoothIntersect(sdBox(p, vec2(${bs}, ${bs})), sdCircle(p, ${cr}), ${kv});
+        float d = molSmoothIntersect(p, ${bs}, ${cr}, ${kv});
         return ${col(display)};
       }
     `);
@@ -94,9 +85,6 @@ export const SmoothIntersect = {
 };
 
 // ── Wireframe Triangle ────────────────────────────────────────────────────────
-// Three capsules (line segments) joined at equilateral triangle vertices.
-// Capsule with small radius = line; union of three = shape outline.
-// This is the molecule answer to "what is a line?" — a thin capsule.
 export const WireframeTriangle = {
   args: { size: 0.36, thickness: 0.012, ...display },
   argTypes: {
@@ -105,21 +93,10 @@ export const WireframeTriangle = {
     ...displayType,
   },
   render: ({ size, thickness, display }) => {
-    const th = thickness.toFixed(4);
-    const verts = [0, 1, 2].map(i => {
-      const a = Math.PI / 2 + i * 2 * Math.PI / 3;
-      return [
-        (Math.cos(a) * size).toFixed(4),
-        (Math.sin(a) * size).toFixed(4),
-      ];
-    });
-    const [v0, v1, v2] = verts;
+    const r = size.toFixed(4), t = thickness.toFixed(4);
     return sdfStory(`
       vec3 render(vec2 p) {
-        float s0 = sdCapsule(p, vec2(${v0[0]}, ${v0[1]}), vec2(${v1[0]}, ${v1[1]}), ${th});
-        float s1 = sdCapsule(p, vec2(${v1[0]}, ${v1[1]}), vec2(${v2[0]}, ${v2[1]}), ${th});
-        float s2 = sdCapsule(p, vec2(${v2[0]}, ${v2[1]}), vec2(${v0[0]}, ${v0[1]}), ${th});
-        float d = opUnion(opUnion(s0, s1), s2);
+        float d = molWireframeTriangle(p, ${r}, ${t});
         return ${col(display)};
       }
     `);
@@ -127,7 +104,6 @@ export const WireframeTriangle = {
 };
 
 // ── Ring Lattice ──────────────────────────────────────────────────────────────
-// Grid repeat + opSubtract: one tiling concept with a cutout.
 export const RingLattice = {
   args: { ringRadius: 0.28, ringThickness: 0.06, spotRadius: 0.08, spacing: 0.7, ...display },
   argTypes: {
@@ -142,8 +118,7 @@ export const RingLattice = {
     const sr = spotRadius.toFixed(4), sp = spacing.toFixed(4);
     return sdfStory(`
       vec3 render(vec2 p) {
-        vec2  tp = opRepeat(p, vec2(${sp}));
-        float d  = opSubtract(sdRing(tp, ${rr}, ${rt}), sdCircle(tp, ${sr}));
+        float d = molRingLattice(p, ${rr}, ${rt}, ${sr}, ${sp});
         return ${col(display)};
       }
     `);

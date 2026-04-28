@@ -345,6 +345,10 @@ SDF2D stories define a GLSL `vec3 render(vec2 p)` function using signed-distance
 yarn dev:sdf2d
 ```
 
+| | |
+|---|---|
+| ![Sierpinski gasket](docs/screenshots/sdf2d-sierpinski%20gasket.png) | ![Sierpinski carpet](docs/screenshots/sdf2d-sierpinski%20carpet.png) |
+
 **Stories:**
 
 *Atoms*
@@ -354,9 +358,11 @@ yarn dev:sdf2d
 - `SDF2D / Molecules / CSG` — Union, Intersect, Subtract, SmoothUnion, SmoothIntersect, SmoothSubtract — each with separation and shape-size sliders to expose the operation boundary
 - `SDF2D / Molecules / Domain` — Flower (polar-repeat petal), Starburst (polar-repeat capsule rays with punched centre), Shells (onion layers via `abs(d) − t`)
 - `SDF2D / Molecules / Operations` — Lens, Crescent, SmoothScoop, SmoothIntersect, WireframeTriangle (three capsule edges), RingLattice (grid-repeat ring with punched spot)
+- `SDF2D / Molecules / Compositions` — SmoothBlob (four circles smooth-unioned), Dumbbell (capsule bar + end spheres), Wings (mirror + rotate + union), Tile (grid-repeat ring+cross motif), Kaleidoscope (mirror + polar repeat + smooth union + centre punch)
 
 *Organisms*
-- `SDF2D / Organisms / Compositions` — SmoothBlob (four circles smooth-unioned), Dumbbell (capsule bar + end spheres), Wings (mirror + rotate + union), Tile (grid-repeat ring+cross motif), Kaleidoscope (mirror + polar repeat + smooth union + centre punch)
+- `SDF2D / Organisms / Compositions` — Emblem (Wings + Lens as shield boss), TriForce (three WireframeTriangle molecules at equilateral triangle vertices), Cell (SmoothBlob nucleus + RingLattice membrane), GearMandala (Kaleidoscope outer ring + WireframeTriangle centre)
+- `SDF2D / Organisms / Fractals` — RoadNetwork (seeded LCG procedural branching roads), KochSnowflake (recursive edge subdivision), Sierpinski (IFS nearest-vertex iteration), SierpinskiCarpet (mod-based centre-third subtraction), DragonCurve (IFS turn-sequence), LevyCCurve (90°-rotated midpoint subdivision), FractalTree (binary branching)
 
 ---
 

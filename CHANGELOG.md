@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `src/sdf2d/molecules-lib.js` — GLSL molecule function library: `molLens`, `molCrescent`, `molSmoothScoop`, `molSmoothIntersect`, `molWireframeTriangle`, `molRingLattice`, `molSmoothBlob`, `molDumbbell`, `molWings`, `molTile`, `molKaleidoscope`; injected into every `sdfStory` shader after `PRIMITIVES`
+- `SDF2D/Molecules/Compositions` — SmoothBlob, Dumbbell, Wings, Tile, Kaleidoscope moved from Organisms; stories now call their respective `mol*` functions
+- `SDF2D/Organisms/Compositions` — replaced with true organisms that compose molecule functions: Emblem (`molWings` + `molLens`), TriForce (`molWireframeTriangle` × 3), Cell (`molSmoothBlob` + `molRingLattice`), GearMandala (`molKaleidoscope` + `molWireframeTriangle`)
+
+### Changed
+- `SDF2D/Molecules/Operations` — all six stories now call their named `mol*` functions rather than inlining equivalent GLSL
+
 ## [0.13.1] - 2026-04-27
 
 ### Added
