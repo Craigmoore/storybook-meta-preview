@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.14.0] - 2026-04-28
 
 ### Added
 - `src/sdf2d/molecules-lib.js` — GLSL molecule function library: `molLens`, `molCrescent`, `molSmoothScoop`, `molSmoothIntersect`, `molWireframeTriangle`, `molRingLattice`, `molSmoothBlob`, `molDumbbell`, `molWings`, `molTile`, `molKaleidoscope`; injected into every `sdfStory` shader after `PRIMITIVES`
