@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.15.0] - 2026-04-29
 
 ### Added
 - `src/bantervr-ui/molecules/components.js` — molecule constructor functions: `makeStatusBadge`, `makePlayerRow`, `makeToggleRow`, `makeSliderRow`; each returns a UI element for composition in organism stories
