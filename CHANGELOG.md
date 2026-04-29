@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `src/bantervr-ui/molecules/components.js` — molecule constructor functions: `makeStatusBadge`, `makePlayerRow`, `makeToggleRow`, `makeSliderRow`; each returns a UI element for composition in organism stories
+- `SDF2D/Organisms/Effects/ImpastoArcs` — concentric sinusoidally-modulated arc SDF; waveform phase shifts per ring via golden-angle offset
+- `SDF2D/Organisms/Effects/NeonPulse` — three animated ring-SDF systems (`abs(mod(r−v·t,P)−P/2)−hw`) with different periods; animated moiré from overlapping ring families
+- `SDF2D/Organisms/Effects/ChainMail` — two diagonally-offset square lattices of ring SDFs; union produces interlocking link pattern
+- `SDF2D/Organisms/Effects/TopographicContours` — layered-sine terrain height field; contour SDF `(fract(h·N)−0.5)/(N·|∇h|)` via central-difference gradient
+- `SDF2D/Organisms/Effects/ZebraVortex` — stripe SDF `sin(f·π)/(π·|∇f|)` in a spiral-warped polar field; gradient computed analytically via chain rule; animated
+
+### Changed
+- `BanterVR-UI/Organisms/GameLobby` — refactored to compose molecule constructors from `components.js` rather than building all sub-elements inline; fixes atomic design hierarchy violation
+
 ## [0.14.0] - 2026-04-28
 
 ### Added
