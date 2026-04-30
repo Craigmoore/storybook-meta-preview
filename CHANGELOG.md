@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.17.0] - 2026-04-30
 
 ### Fixed
 - `displayArgType` select control was silently broken (`options` was nested inside `control` instead of at the argType level) — `display` dropdown now works across all SDF3D stories
