@@ -198,3 +198,17 @@ export const repeatPolar = (n, f) => {
     return f(_p.set(Math.cos(a) * r, p.y, Math.sin(a) * r));
   };
 };
+
+// ── Sweep operations ──────────────────────────────────────────────────────────
+// f2d is a 2D SDF: (x, y) => number
+
+// Revolve a 2D profile around the Y axis. offset shifts the profile radially,
+// so offset=0 gives a solid of revolution and offset>0 gives a torus-like ring.
+export const revolve = (offset, f2d) => (p) => f2d(len2(p.x, p.z) - offset, p.y);
+
+// Extrude a 2D profile along the Z axis. h is the half-height of the extrusion.
+export const extrude = (h, f2d) => (p) => {
+  const d  = f2d(p.x, p.y);
+  const wz = Math.abs(p.z) - h;
+  return Math.min(Math.max(d, wz), 0) + len2(Math.max(d, 0), Math.max(wz, 0));
+};

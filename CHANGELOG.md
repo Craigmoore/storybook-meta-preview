@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- `displayArgType` select control was silently broken (`options` was nested inside `control` instead of at the argType level) — `display` dropdown now works across all SDF3D stories
+- `drawLetter` in `ProjectionSdf` stories now detects the actual pixel bounding box of the rendered glyph (2× temp canvas + dark-pixel scan) and stretches it to a uniform span, ensuring all three axis silhouettes are consistent for the intersection technique
+
+### Added
+- `cameraArgType` and `camera` option in `sdf3dStory` — orthographic views along each axis (`ortho-X`, `ortho-Y`, `ortho-Z`) plus the default `perspective` orbiting camera; `ProjectionSdf` stories expose this as a dropdown control so each letter face can be inspected head-on
+- `src/sdf3d/profiles2d.js` — JS ports of 2D SDF profiles for use with sweep operations: `circle2D`, `box2D`, `hexagon2D`, `pentagon2D`, `star5_2D`, `cross2D`, `heart2D`, `egg2D`
+- `revolve(offset, f2d)` and `extrude(h, f2d)` sweep operators added to `src/sdf3d/primitives.js`
+- `src/sdf3d/rasterSdf2d.js` — `drawToSdf2D(drawFn, opts)`, `textToSdf2D(text, opts)`, and `projectionSdf3D(drawX, drawY, drawZ, opts)`: three canvas silhouettes (one per axis) intersected into a 3D SDF: canvas rasterisation → Felzenszwalb–Huttenlocher Euclidean distance transform → bilinear-interpolated 2D SDF function
+- `src/sdf3d/glyphSdf2d.js` — `loadThreeFont()` and `textToGlyphSdf2D(font, text, opts)`: exact 2D SDF from Three.js typeface JSON bezier outlines; analytic cubic solve for quadratic bezier distance, Newton-refined sampling for cubic; non-zero winding rule for sign
+- `SDF3D/Molecules/Text` — RasterLetter, RasterWord (canvas SDF); GlyphLetter, GlyphWord, GlyphOps (exact bezier SDF with twist/onion composability)
+- `SDF3D/Molecules/ProjectionSdf` — 5 stories: TriCircle (three circles ≈ sphere), TriStar (star intersected on all axes), MixedSilhouettes (circle × star × cross), LetterBlock (one letter per axis — the sculptor's technique), HexStar (hex prism with star punched through)
+- `SDF3D/Molecules/Sweep` — 9 sweep stories: CircleRevolution, StarRevolution, PentagonRevolution, HeartRevolution, EggRevolution, StarExtrusion, HexExtrusion, CrossExtrusion, HeartExtrusion
+- `SDF3D/Organisms/SweepCompositions` — 5 organisms combining revolution and extrusion: SpiralStars (star discs stacked with increasing rotation — continuous helical form), HelixCoil (circle profile swept along a helix path — coil spring), TwinHelix (two intertwined helix strands with distinct profiles), KaleidoscoPrism (2D polar-repeated egg profile extruded — kaleidoscope top view), StarWreath (star prisms arranged around a revolve ring, each rotated outward)
+
 ## [0.16.0] - 2026-04-30
 
 ### Added

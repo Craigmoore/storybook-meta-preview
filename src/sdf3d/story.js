@@ -5,7 +5,13 @@ import { buildIsosurface } from './isosurface.js';
 let cleanupPrev = null;
 
 export const displayArgType = {
-  control: { type: 'select', options: ['normals', 'solid', 'wireframe'] },
+  options: ['normals', 'solid', 'wireframe'],
+  control: { type: 'select' },
+};
+
+export const cameraArgType = {
+  options: ['perspective', 'ortho-Z', 'ortho-X', 'ortho-Y'],
+  control: { type: 'select' },
 };
 
 // sdf3dStory(mapFn, opts)
@@ -16,9 +22,9 @@ export const displayArgType = {
 export function sdf3dStory(mapFn, opts = {}) {
   if (cleanupPrev) { cleanupPrev(); cleanupPrev = null; }
 
-  const { display = 'normals', resolution = 32, bounds = 1.5 } = opts;
+  const { display = 'normals', resolution = 32, bounds = 1.5, camera = 'perspective' } = opts;
 
-  const dims    = [resolution, resolution, resolution];
+  const dims      = [resolution, resolution, resolution];
   const boundsArr = [[-bounds, -bounds, -bounds], [bounds, bounds, bounds]];
   const geometry = buildIsosurface(dims, mapFn, boundsArr);
 
@@ -48,18 +54,27 @@ export function sdf3dStory(mapFn, opts = {}) {
   renderer.setSize(W, H);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  const camera = new THREE.PerspectiveCamera(50, W / H, 0.01, 100);
-  camera.position.set(1.8, 1.4, 2.2);
-  camera.lookAt(0, 0, 0);
+  let cam;
+  if (camera === 'perspective') {
+    cam = new THREE.PerspectiveCamera(50, W / H, 0.01, 100);
+    cam.position.set(1.8, 1.4, 2.2);
+  } else {
+    const s = bounds * 1.1;
+    cam = new THREE.OrthographicCamera(-s, s, s, -s, 0.01, 100);
+    if      (camera === 'ortho-Z') cam.position.set(0, 0, 10);
+    else if (camera === 'ortho-X') cam.position.set(10, 0, 0);
+    else if (camera === 'ortho-Y') cam.position.set(0, 10, 0);
+  }
+  cam.lookAt(0, 0, 0);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = new OrbitControls(cam, renderer.domElement);
   controls.enableDamping = true;
 
   let frameId;
   (function animate() {
     frameId = requestAnimationFrame(animate);
     controls.update();
-    renderer.render(scene, camera);
+    renderer.render(scene, cam);
   })();
 
   cleanupPrev = () => {
