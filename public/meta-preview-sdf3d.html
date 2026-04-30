@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Meta Preview — SDF3D</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; background: #0d0d12; overflow: hidden; }
+    canvas { display: block; width: 100% !important; height: 100% !important; }
+    #status { position: fixed; top: 8px; right: 12px; font: 11px monospace; color: #333; pointer-events: none; }
+    #label  { position: fixed; top: 8px; left:  12px; font: 11px monospace; color: #333; pointer-events: none; }
+  </style>
+  <script type="importmap">
+    { "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    } }
+  </script>
+</head>
+<body>
+  <div id="status">connecting…</div>
+  <div id="label"></div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const status = document.getElementById('status');
+    const label  = document.getElementById('label');
+
+    // ── Three.js scene ────────────────────────────────────────────────────────
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x0d0d12);
+    document.body.appendChild(renderer.domElement);
+
+    const scene  = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, 1, 0.01, 100);
+    camera.position.set(1.8, 1.4, 2.2);
+    camera.lookAt(0, 0, 0);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    const ambLight = new THREE.AmbientLight(0xffffff, 0.5);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+    dirLight.position.set(3, 5, 4);
+    scene.add(ambLight, dirLight);
+
+    let currentMesh = null;
+
+    function resize() {
+      const w = window.innerWidth, h = window.innerHeight;
+      renderer.setSize(w, h);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    (function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    })();
+
+    // ── Geometry update ───────────────────────────────────────────────────────
+
+    function applyGeometry({ positions, normals, index, display }) {
+      if (currentMesh) {
+        currentMesh.geometry.dispose();
+        currentMesh.material.dispose();
+        scene.remove(currentMesh);
+        currentMesh = null;
+      }
+      // Remove solid-mode lights when not needed
+      ambLight.visible = dirLight.visible = (display === 'solid');
+
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
+      geometry.setAttribute('normal',   new THREE.BufferAttribute(new Float32Array(normals),   3));
+      if (index) geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(index), 1));
+
+      let material;
+      if (display === 'wireframe') {
+        material = new THREE.MeshBasicMaterial({ color: 0x88aacc, wireframe: true });
+      } else if (display === 'solid') {
+        material = new THREE.MeshStandardMaterial({ color: 0x7fa8cc, roughness: 0.35, metalness: 0.15 });
+      } else {
+        material = new THREE.MeshNormalMaterial();
+      }
+
+      currentMesh = new THREE.Mesh(geometry, material);
+      scene.add(currentMesh);
+    }
+
+    // ── WebSocket ─────────────────────────────────────────────────────────────
+
+    const port  = location.port || 3342;
+    const wsUrl = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.hostname}:${port}`;
+
+    function connect() {
+      const ws = new WebSocket(wsUrl);
+
+      ws.addEventListener('open', () => {
+        ws.send(JSON.stringify({ type: 'register', role: 'sdf3d-preview' }));
+        status.textContent = 'connected';
+      });
+
+      ws.addEventListener('message', (ev) => {
+        let msg;
+        try { msg = JSON.parse(ev.data); } catch { return; }
+        if (msg.type !== 'story-rendered' || !msg.sdf3dData) return;
+
+        label.textContent = `${msg.kind} / ${msg.name}`;
+        applyGeometry(msg.sdf3dData);
+      });
+
+      ws.addEventListener('close', () => {
+        status.textContent = 'disconnected — reconnecting…';
+        setTimeout(connect, 2000);
+      });
+
+      ws.addEventListener('error', () => ws.close());
+    }
+
+    connect();
+  </script>
+</body>
+</html>

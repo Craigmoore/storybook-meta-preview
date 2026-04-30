@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `sdf3d` setup: SDF3D story library — stories define JavaScript signed-distance functions; marching cubes tessellates the isosurface; Three.js renders via `sdf3dStory()` with OrbitControls
+- `src/sdf3d/marchingcubes.js` — JS port of the classic Paul Bourke marching-cubes algorithm
+- `src/sdf3d/isosurface.js` — `buildIsosurface(dims, mapFn, bounds)` helper; builds a `THREE.BufferGeometry` with central-difference gradient normals
+- `src/sdf3d/primitives.js` — functional SDF library: `sphere`, `box`, `roundBox`, `torus`, `cappedTorus`, `verticalCapsule`, `cylinder`, `roundedCylinder`, `cappedCone`, `octahedron`, `link`, `boxFrame`; boolean ops `union`, `intersect`, `subtract`, `smoothUnion`, `smoothIntersect`, `smoothSubtract`; domain ops `translate`, `scale`, `rotateX/Y/Z`, `mirrorX`, `onion`
+- `src/sdf3d/story.js` — `sdf3dStory(mapFn, opts)` helper; `display` controls material (normals / solid / wireframe); `resolution` controls marching-cubes grid size; `displayArgType` for Storybook controls
+- `SDF3D/Atoms/Shapes` — Sphere, Box, RoundBox, Torus, CappedTorus, VerticalCapsule, Cylinder, RoundedCylinder, CappedCone, Octahedron, Link, BoxFrame
+- `SDF3D/Molecules/CSG` — Union, Intersect, Subtract, SmoothUnion, SmoothIntersect, SmoothSubtract; each story has a separation slider to show shapes coming apart or merging
+- `SDF3D/Molecules/Domain` — Onion (hollow torus shell), Twist (twisted rounded pillar), Elongate (anisotropic octahedron), RepeatPolar (N-fold radial symmetry of capsules)
+- `SDF3D/Organisms/Compositions` — Metaballs (N spheres on a ring, smooth union), Dumbbell (spheres + capsule stem), CrystalCluster (Fibonacci-lattice octahedra), TwistedTower (twist + base ring), Gyroid (thickened triply-periodic minimal surface)
+- `SDF3D/Organisms/Fractals` — MengerSponge (recursive cross-subtraction, iter 1–3), SierpinskiTetrahedron (IFS fold-scale, iter 1–6)
+- `src/sdf3d/primitives.js` — added `twist`, `elongate`, `repeatPolar` domain operations
+- `public/meta-preview-sdf3d.html` — standalone SDF3D renderer; receives pre-tessellated geometry (position/normal arrays) from relay and renders with Three.js + OrbitControls; supports normals / solid / wireframe display modes
+
 ## [0.15.0] - 2026-04-29
 
 ### Added

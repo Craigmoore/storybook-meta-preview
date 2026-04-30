@@ -33,6 +33,7 @@ export const decorators = [
     window.__metaPreviewBanterVR3D = null;
     window.__metaPreviewTUI        = null;
     window.__metaPreviewSDF2D      = null;
+    window.__metaPreviewSDF3D      = null;
     const result = StoryFn();
 
     requestAnimationFrame(() => {
@@ -111,6 +112,18 @@ export const decorators = [
           sdf2dData: window.__metaPreviewSDF2D,
         }));
         window.__metaPreviewSDF2D = null;
+        return;
+      }
+
+      if (window.__metaPreviewSDF3D) {
+        relay.send(JSON.stringify({
+          type:     'story-rendered',
+          storyId:  context.id,
+          name:     context.name,
+          kind:     context.kind,
+          sdf3dData: window.__metaPreviewSDF3D,
+        }));
+        window.__metaPreviewSDF3D = null;
         return;
       }
 

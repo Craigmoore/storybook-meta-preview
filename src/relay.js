@@ -36,7 +36,7 @@ function handleConnection(ws) {
       const payload = JSON.stringify(msg);
       for (const client of clients) {
         if (
-          (client.role === 'meta-preview' || client.role === 'banter-inject' || client.role === 'tui-preview' || client.role === 'sdf2d-preview')
+          (client.role === 'meta-preview' || client.role === 'banter-inject' || client.role === 'tui-preview' || client.role === 'sdf2d-preview' || client.role === 'sdf3d-preview')
           && client.readyState === WebSocket.OPEN
         ) {
           client.send(payload);

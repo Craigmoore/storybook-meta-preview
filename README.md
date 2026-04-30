@@ -364,6 +364,35 @@ yarn dev:sdf2d
 - `SDF2D / Organisms / Compositions` — Emblem (Wings + Lens as shield boss), TriForce (three WireframeTriangle molecules at equilateral triangle vertices), Cell (SmoothBlob nucleus + RingLattice membrane), GearMandala (Kaleidoscope outer ring + WireframeTriangle centre)
 - `SDF2D / Organisms / Fractals` — RoadNetwork (seeded LCG procedural branching roads), KochSnowflake (recursive edge subdivision), Sierpinski (IFS nearest-vertex iteration), SierpinskiCarpet (mod-based centre-third subtraction), DragonCurve (IFS turn-sequence), LevyCCurve (90°-rotated midpoint subdivision), FractalTree (binary branching)
 
+### sdf3d
+
+SDF3D stories define JavaScript signed-distance functions — `(THREE.Vector3) => number` — using primitives and operations from the shared functional SDF library. The Storybook preview evaluates the SDF via marching cubes (CPU) to produce a `THREE.BufferGeometry`, then renders it with Three.js and OrbitControls. Normals are computed via central-difference gradient rather than face averaging, giving smooth shading on all SDF surfaces. The meta-preview receives the pre-tessellated geometry over WebSocket and renders it independently with its own OrbitControls.
+
+| | |
+|---|---|
+| Storybook | `http://[host]:6015` |
+| Meta Preview | `http://[host]:3342/meta-preview-sdf3d.html` |
+
+**Run:**
+```bash
+yarn dev:sdf3d
+```
+
+Each story has a `display` control (`normals` / `solid` / `wireframe`) and a `resolution` slider (marching cubes grid size, 16–64).
+
+**Stories:**
+
+*Atoms*
+- `SDF3D / Atoms / Shapes` — Sphere, Box, RoundBox, Torus, CappedTorus, VerticalCapsule, Cylinder, RoundedCylinder, CappedCone, Octahedron, Link, BoxFrame
+
+*Molecules*
+- `SDF3D / Molecules / CSG` — Union, Intersect, Subtract, SmoothUnion, SmoothIntersect, SmoothSubtract — each with a separation slider to show shapes coming apart or merging
+- `SDF3D / Molecules / Domain` — Onion (hollow torus shell), Twist (twist-rate and width controls), Elongate (anisotropic octahedron via per-axis stretch), RepeatPolar (N-fold radial symmetry of capsules around the Y axis)
+
+*Organisms*
+- `SDF3D / Organisms / Compositions` — Metaballs (N spheres on a ring merged by smooth union), Dumbbell (two spheres + capsule stem), CrystalCluster (Fibonacci-lattice octahedra), TwistedTower (twisted pillar + base ring), Gyroid (thickened triply-periodic minimal surface)
+- `SDF3D / Organisms / Fractals` — MengerSponge (recursive cross-subtraction, iter 1–3), SierpinskiTetrahedron (IFS fold-scale, iter 1–6)
+
 ---
 
 ## Installation
@@ -432,6 +461,14 @@ src/
     atoms/
     molecules/
     organisms/
+  sdf3d/
+    marchingcubes.js        # JS port of the classic Paul Bourke marching-cubes algorithm
+    isosurface.js           # buildIsosurface() — marching cubes → THREE.BufferGeometry with central-difference normals
+    primitives.js           # functional SDF library: primitives (sphere, box, torus, …), boolean ops, domain ops (twist, elongate, repeatPolar, …)
+    story.js                # sdf3dStory() — tessellates SDF, renders in Storybook with Three.js + OrbitControls, packages geometry for relay; displayArgType
+    atoms/
+    molecules/
+    organisms/
 public/
   meta-preview.html                  # html setup meta-preview
   meta-preview-threejs-2d.html       # threejs-2d meta-preview
@@ -445,5 +482,6 @@ public/
   bantervr-3d-test.js                # bantervr-3d standalone demo / known-good reference
   meta-preview-tui.html              # tui meta-preview (xterm.js terminal, ANSI rendering)
   meta-preview-sdf2d.html            # sdf2d meta-preview (WebGL2 fragment shader renderer)
+  meta-preview-sdf3d.html            # sdf3d meta-preview (Three.js mesh renderer, receives pre-tessellated geometry)
 setups.js                   # registry of all setups and their ports
 ```
