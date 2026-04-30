@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.16.0] - 2026-04-30
 
 ### Added
 - `sdf3d` setup: SDF3D story library — stories define JavaScript signed-distance functions; marching cubes tessellates the isosurface; Three.js renders via `sdf3dStory()` with OrbitControls
