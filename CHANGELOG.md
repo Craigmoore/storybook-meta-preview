@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.17.1] - 2026-05-02
 
 ### Changed
 - Resolution slider extended from 16–64 to 16–128 across all SDF3D stories
