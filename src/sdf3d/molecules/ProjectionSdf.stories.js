@@ -6,7 +6,7 @@ export default { title: 'SDF3D/Molecules/ProjectionSdf' };
 const shared     = { display: 'normals', resolution: 40, camera: 'perspective' };
 const sharedType = {
   display:    displayArgType,
-  resolution: { control: { type: 'range', min: 24, max: 64, step: 8 } },
+  resolution: { control: { type: 'range', min: 24, max: 128, step: 8 } },
   camera:     cameraArgType,
 };
 const range = (min, max, step) => ({ control: { type: 'range', min, max, step } });

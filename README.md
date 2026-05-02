@@ -378,7 +378,7 @@ SDF3D stories define JavaScript signed-distance functions — `(THREE.Vector3) =
 yarn dev:sdf3d
 ```
 
-Each story has a `display` control (`normals` / `solid` / `wireframe`) and a `resolution` slider (marching cubes grid size, 16–64).
+Each story has a `display` control (`normals` / `solid` / `wireframe`), a `resolution` slider (marching cubes grid size, 16–128), and a `camera` control (`perspective` / `ortho-X` / `ortho-Y` / `ortho-Z`). The orthographic views snap to look straight down each world axis — useful for inspecting projection SDF silhouettes or letter faces head-on.
 
 **Stories:**
 
@@ -388,10 +388,14 @@ Each story has a `display` control (`normals` / `solid` / `wireframe`) and a `re
 *Molecules*
 - `SDF3D / Molecules / CSG` — Union, Intersect, Subtract, SmoothUnion, SmoothIntersect, SmoothSubtract — each with a separation slider to show shapes coming apart or merging
 - `SDF3D / Molecules / Domain` — Onion (hollow torus shell), Twist (twist-rate and width controls), Elongate (anisotropic octahedron via per-axis stretch), RepeatPolar (N-fold radial symmetry of capsules around the Y axis)
+- `SDF3D / Molecules / Sweep` — 2D SDF profiles swept in 3D: CircleRevolution, StarRevolution, PentagonRevolution, HeartRevolution, EggRevolution (surfaces of revolution); StarExtrusion, HexExtrusion, CrossExtrusion, HeartExtrusion (linear extrusions)
+- `SDF3D / Molecules / Text` — RasterLetter, RasterWord (canvas text → Felzenszwalb–Huttenlocher EDT → extruded solid); GlyphLetter, GlyphWord, GlyphOps (exact bezier SDF from Three.js Helvetiker Bold typeface JSON — twist and onion operations remain correct because distances are exact)
+- `SDF3D / Molecules / ProjectionSdf` — three canvas silhouettes (one per axis) intersected into a 3D solid: TriCircle (three circles ≈ sphere), TriStar (star on all three axes), MixedSilhouettes (circle × star × cross), LetterBlock (one letter per axis — the sculptor's/CNC technique), HexStar (hex prism with star punched through from above)
 
 *Organisms*
 - `SDF3D / Organisms / Compositions` — Metaballs (N spheres on a ring merged by smooth union), Dumbbell (two spheres + capsule stem), CrystalCluster (Fibonacci-lattice octahedra), TwistedTower (twisted pillar + base ring), Gyroid (thickened triply-periodic minimal surface)
 - `SDF3D / Organisms / Fractals` — MengerSponge (recursive cross-subtraction, iter 1–3), SierpinskiTetrahedron (IFS fold-scale, iter 1–6)
+- `SDF3D / Organisms / SweepCompositions` — SpiralStars (star discs stacked with increasing rotation), HelixCoil (circle profile swept along a helix path), TwinHelix (two intertwined helix strands), KaleidoscoPrism (2D polar-repeated egg profile extruded), StarWreath (star prisms around a revolve ring)
 
 ---
 
@@ -464,8 +468,11 @@ src/
   sdf3d/
     marchingcubes.js        # JS port of the classic Paul Bourke marching-cubes algorithm
     isosurface.js           # buildIsosurface() — marching cubes → THREE.BufferGeometry with central-difference normals
-    primitives.js           # functional SDF library: primitives (sphere, box, torus, …), boolean ops, domain ops (twist, elongate, repeatPolar, …)
-    story.js                # sdf3dStory() — tessellates SDF, renders in Storybook with Three.js + OrbitControls, packages geometry for relay; displayArgType
+    primitives.js           # functional SDF library: primitives (sphere, box, torus, …), boolean ops, domain ops (twist, elongate, revolve, extrude, repeatPolar, …)
+    profiles2d.js           # 2D SDF profiles for sweep ops: circle2D, box2D, hexagon2D, pentagon2D, star5_2D, cross2D, heart2D, egg2D
+    rasterSdf2d.js          # drawToSdf2D(), textToSdf2D() (canvas → Felzenszwalb–Huttenlocher EDT → 2D SDF), projectionSdf3D() (three-axis silhouette intersection)
+    glyphSdf2d.js           # loadThreeFont(), textToGlyphSdf2D() — exact bezier SDF from Three.js typeface JSON; analytic quadratic + Newton cubic; non-zero winding sign
+    story.js                # sdf3dStory() — tessellates SDF, renders in Storybook with Three.js + OrbitControls, packages geometry for relay; displayArgType, cameraArgType
     atoms/
     molecules/
     organisms/

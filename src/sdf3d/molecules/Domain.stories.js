@@ -7,7 +7,7 @@ export default { title: 'SDF3D/Molecules/Domain' };
 const shared     = { display: 'normals', resolution: 32 };
 const sharedType = {
   display:    displayArgType,
-  resolution: { control: { type: 'range', min: 16, max: 64, step: 8 } },
+  resolution: { control: { type: 'range', min: 16, max: 128, step: 8 } },
 };
 const range = (min, max, step) => ({ control: { type: 'range', min, max, step } });
 

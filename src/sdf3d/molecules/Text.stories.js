@@ -8,7 +8,7 @@ export default { title: 'SDF3D/Molecules/Text' };
 const shared     = { display: 'solid', resolution: 40 };
 const sharedType = {
   display:    displayArgType,
-  resolution: { control: { type: 'range', min: 24, max: 64, step: 8 } },
+  resolution: { control: { type: 'range', min: 24, max: 128, step: 8 } },
 };
 const range = (min, max, step) => ({ control: { type: 'range', min, max, step } });
 
