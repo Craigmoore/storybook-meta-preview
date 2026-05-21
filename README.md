@@ -366,17 +366,35 @@ yarn dev:sdf2d
 
 ### sdf3d
 
+**Sphere**
+![bantervr-sdf3d sphere](docs/screenshots/bantervr-sdf3d-sphere.png)
+
+**Metaballs**
+![bantervr-sdf3d metaballs](docs/screenshots/bantervr-sdf3d-metaballs.png)
+
 SDF3D stories define JavaScript signed-distance functions — `(THREE.Vector3) => number` — using primitives and operations from the shared functional SDF library. The Storybook preview evaluates the SDF via marching cubes (CPU) to produce a `THREE.BufferGeometry`, then renders it with Three.js and OrbitControls. Normals are computed via central-difference gradient rather than face averaging, giving smooth shading on all SDF surfaces. The meta-preview receives the pre-tessellated geometry over WebSocket and renders it independently with its own OrbitControls.
 
 | | |
 |---|---|
 | Storybook | `http://[host]:6015` |
 | Meta Preview | `http://[host]:3342/meta-preview-sdf3d.html` |
+| Inject (HTTPS) | `https://[host]:33420` |
 
 **Run:**
 ```bash
 yarn dev:sdf3d
 ```
+
+**BanterVR in-world setup:**
+
+Add the inject script to your Banter world's `index.html`. The `uuid` attribute must match the game object name that owns the Visual Script (defaults to `sdf3d` if omitted):
+
+```html
+<script uuid="sdf3d"
+        src="https://[host]:33420/meta-preview-bantervr-sdf3d-inject.js"></script>
+```
+
+The script connects to the relay, receives marching-cubes geometry whenever a story renders, and exposes the full `BanterThreeJsMarshallingService` paged wire API as `window` globals (`injectVerticesPaged`, `injectNormalsPaged`, `injectIndicesPaged`, etc.) for the Visual Script to call. It then triggers `SendToVisualScripting(uuid + '.updateGeometryPaged', '')` to notify the Visual Script that new geometry is ready.
 
 Each story has a `display` control (`normals` / `solid` / `wireframe`), a `resolution` slider (marching cubes grid size, 16–128), and a `camera` control (`perspective` / `ortho-X` / `ortho-Y` / `ortho-Z`). The orthographic views snap to look straight down each world axis — useful for inspecting projection SDF silhouettes or letter faces head-on.
 
@@ -489,6 +507,7 @@ public/
   bantervr-3d-test.js                # bantervr-3d standalone demo / known-good reference
   meta-preview-tui.html              # tui meta-preview (xterm.js terminal, ANSI rendering)
   meta-preview-sdf2d.html            # sdf2d meta-preview (WebGL2 fragment shader renderer)
-  meta-preview-sdf3d.html            # sdf3d meta-preview (Three.js mesh renderer, receives pre-tessellated geometry)
+  meta-preview-sdf3d.html                    # sdf3d meta-preview (Three.js mesh renderer, receives pre-tessellated geometry)
+  meta-preview-bantervr-sdf3d-inject.js     # sdf3d in-world inject script — exposes paged geometry wire API as window globals, triggers Visual Script on each story render
 setups.js                   # registry of all setups and their ports
 ```

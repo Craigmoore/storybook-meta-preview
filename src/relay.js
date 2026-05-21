@@ -9,6 +9,13 @@ import { dirname, join } from 'path';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
 app.use(express.static(join(__dirname, '..', 'public')));
 
 const certPath = join(__dirname, '..', 'certs', 'cert.pem');
@@ -36,7 +43,7 @@ function handleConnection(ws) {
       const payload = JSON.stringify(msg);
       for (const client of clients) {
         if (
-          (client.role === 'meta-preview' || client.role === 'banter-inject' || client.role === 'tui-preview' || client.role === 'sdf2d-preview' || client.role === 'sdf3d-preview')
+          (client.role === 'meta-preview' || client.role === 'banter-inject' || client.role === 'tui-preview' || client.role === 'sdf2d-preview' || client.role === 'sdf3d-preview' || client.role === 'bantervr-sdf3d-inject')
           && client.readyState === WebSocket.OPEN
         ) {
           client.send(payload);
