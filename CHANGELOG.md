@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.17.2] - 2026-05-21
 
 ### Added
 - `public/meta-preview-bantervr-sdf3d-inject.js` — inject script for BanterVR SDF3D integration; include in a Banter world's `index.html` with a `uuid` attribute matching the Visual Script game object name; connects to the SDF3D relay via WebSocket, receives marching-cubes geometry on each story render, and exposes the full `BanterThreeJsMarshallingService` paged wire API (`injectVerticesPaged`, `injectNormalsPaged`, `injectIndicesPaged`, etc.) as `window` globals; triggers `SendToVisualScripting(uuid + '.updateGeometryPaged', '')` to notify the Visual Script that new geometry is ready
