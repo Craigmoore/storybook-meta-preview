@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.17.4] - 2026-05-21
 
 ### Changed
 - README: added Demo section linking to YouTube playlist
