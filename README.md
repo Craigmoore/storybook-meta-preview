@@ -366,10 +366,16 @@ yarn dev:sdf2d
 
 ### sdf3d
 
-**Sphere**
+**Metaballs**
+![sdf3d metaballs](docs/screenshots/sdf3d-metaballs.png)
+
+**Letter Block**
+![sdf3d letter block](docs/screenshots/sdf3d-letter-block.png)
+
+**Sphere (BanterVR)**
 ![bantervr-sdf3d sphere](docs/screenshots/bantervr-sdf3d-sphere.png)
 
-**Metaballs**
+**Metaballs (BanterVR)**
 ![bantervr-sdf3d metaballs](docs/screenshots/bantervr-sdf3d-metaballs.png)
 
 SDF3D stories define JavaScript signed-distance functions — `(THREE.Vector3) => number` — using primitives and operations from the shared functional SDF library. The Storybook preview evaluates the SDF via marching cubes (CPU) to produce a `THREE.BufferGeometry`, then renders it with Three.js and OrbitControls. Normals are computed via central-difference gradient rather than face averaging, giving smooth shading on all SDF surfaces. The meta-preview receives the pre-tessellated geometry over WebSocket and renders it independently with its own OrbitControls.
@@ -386,6 +392,10 @@ yarn dev:sdf3d
 ```
 
 **BanterVR in-world setup:**
+
+The inject script bridges Storybook and your Banter world: selecting any SDF3D story tessellates the SDF on the CPU, sends the resulting mesh to the relay, and the inject script forwards it into Banter — where a Visual Script reads the geometry via the paged marshalling protocol and applies it to a mesh renderer on a game object. The effect is that any SDF shape you browse in Storybook appears as a real 3D mesh in your world in real time, with no Unity editor involvement.
+
+The Visual Script required is the paged geometry marshalling script from the Banter SDK examples (`GeneratedMeshQuatAOTListThreeJS`). Attach it to the game object whose name you use as the `uuid`.
 
 Add the inject script to your Banter world's `index.html`. The `uuid` attribute must match the game object name that owns the Visual Script (defaults to `sdf3d` if omitted):
 

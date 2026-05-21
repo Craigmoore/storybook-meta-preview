@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- README: added sdf3d screenshots (Metaballs, Letter Block) and expanded BanterVR in-world setup section with end-to-end description of the Storybook → Banter mesh pipeline
+
 ## [0.17.2] - 2026-05-21
 
 ### Added
