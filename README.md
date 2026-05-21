@@ -8,6 +8,12 @@ See `storybookification_summary_v2.md` for the full concept.
 
 ---
 
+## Demo
+
+**[YouTube playlist — all integrations](https://www.youtube.com/playlist?list=PLaKfCBPwsq-P_mKld6xILdG8falcFrF7d)**
+
+---
+
 ## Built with
 
 - [Storybook](https://storybook.js.org) — component story framework; provides the manager UI, controls, and preview iframe
