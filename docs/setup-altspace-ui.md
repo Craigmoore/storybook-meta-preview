@@ -150,6 +150,17 @@ toggle.SetProperty('value', 'true');  // in async inject contexts
 toggle.SetProperty('value', true);
 ```
 
+### Setting label/button text directly against real BS (not via the generic inject pipeline)
+
+Confirmed by a live in-world test on `meta-preview-altspace-tetris-inject.js`: `el.SetProperty(BS.PN.text, value)` does not render — the label/button exists and is sized/styled correctly, but the text is invisible. Set it as a direct property instead:
+```js
+// Correct — matches bantervr-ui-test.js and the working meta-preview-*-inject.js scripts
+label.text = 'Hello';
+// Wrong — silently renders no text on real Altspace (docs show this form, but it doesn't work)
+label.SetProperty(BS.PN.text, 'Hello');
+```
+This only bit a *standalone* in-world script that calls `panel.CreateLabel`/`CreateButton` directly — story authoring (via the mock `BS`) and the generic `meta-preview-altspace-inject.js` pipeline were never affected, since the generic inject script's `buildElement()` already special-cases the `text` property this same correct way (`if (k === 'text') el.text = v; else el.SetProperty(...)`) when translating a story's serialized properties into real BS calls.
+
 ---
 
 ## Reference patterns

@@ -464,7 +464,18 @@ Standalone demo (`public/altspace-ui-test.js`), independent of Storybook:
 <script src="http://[host]:3343/altspace-ui-test.js"></script>
 ```
 
-**Stories:** same set as `bantervr-ui` (Buttons, Labels, Inputs, VisualElement, ActionCard, ButtonGroup, Sliders, Toggles, ScrollView, SettingsPanel, GameLobby) under the `Altspace-UI` title namespace.
+**Stories:** same set as `bantervr-ui` (Buttons, Labels, Inputs, VisualElement, ActionCard, ButtonGroup, Sliders, Toggles, ScrollView, SettingsPanel, GameLobby) under the `Altspace-UI` title namespace, plus one `altspace-ui`-only addition:
+
+- `Altspace-UI / Organisms / Tetris` — a fully playable Tetris built entirely from `UIVisualElement` cells (colour-toggled per block) and `UILabel`s, with a right-hand sidebar showing the next piece (a small 4×4 preview grid) and six `UIButton`s — Left, Right, Rotate left, Rotate right, Drop, Restart — alongside keyboard controls (arrow keys to move, ↑/X to rotate right, Z to rotate left, Space to hard-drop, P to pause, R to restart). Full gameplay (wall-kicks, line clearing, scoring, level speed-up, game over/restart) in the Storybook preview and the meta-preview page. Controls: `cellSize`, `dropIntervalMs`, `cols`, `rows`, `startLevel` — changing any of them resets the game with the new values, since Storybook re-runs the story's `render()` from scratch on every arg change.
+
+  Playing it live in-world on Altspace needs a **third, dedicated file** — `public/meta-preview-altspace-tetris-inject.js` — rather than the generic inject script. `meta-preview-altspace-inject.js` only ever pushes one static snapshot per Storybook story selection (that's true of every other setup here too), which can't drive a continuously-animating, keyboard-controlled game. The Tetris inject script is fully self-contained instead: no relay, no WebSocket, no Storybook — it builds the board with the live BS API and runs its own game loop and input handling directly in-world, so it doesn't touch (or get touched by) the generic pipeline the rest of `altspace-ui` uses.
+
+  ```html
+  <script position="0 1.5 2" rotation="0 0 0" scale="1 1 1"
+          src="http://[host]:3343/meta-preview-altspace-tetris-inject.js"></script>
+  ```
+
+  Optional numeric attributes: `cols`, `rows`, `cellsize`, `dropms`, `startlevel` (defaults match the Storybook story). Controls are read from BS scene-level `key-press` events — **the exact `BS.KeyCode` string values are unverified against a real client** (no live Altspace access from where this was built); every `[tetris] key-press: <value>` is logged to the console so the mapping in the script can be corrected against real values on first in-world test.
 
 See `docs/setup-altspace-ui.md` for the full story-authoring guide, style constraints, and element quirks (identical to `bantervr-ui`, since the UI Toolkit API is unchanged on the Altspace branch).
 
