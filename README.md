@@ -433,7 +433,11 @@ Each story has a `display` control (`normals` / `solid` / `wireframe`), a `resol
 
 ### altspace-ui
 
+![altspace-ui Tetris — Storybook preview next to the live AltspaceVR client](docs/screenshots/tetris.png)
+
 Parallel fork of `bantervr-ui` targeting the `Altspace` branch of BanterSDK (`~/dev/flashygraphics/projects/BanterSDK`) — SideQuest's internal rebrand of the SDK ("SideQuest Creator SDK", Unity 6000.3). As of that branch the UI Toolkit component API (`BanterUIPanel`, `UILabel`, `UIButton`, `UISlider`, `UIToggle`, `UIScrollView`, `UIVisualElement` and their properties) is unchanged from upstream Banter — the only UI-adjacent diffs are a new default theme stylesheet and an internal `PanelReady` C# event, neither of which affects the JS-facing API. This setup exists as its own named copy (own stories, mock, meta-preview, inject script) so it can diverge independently if Altspace's runtime changes later.
+
+Since the UI Toolkit API itself is unchanged, [`docs/sdk-banter.md`](docs/sdk-banter.md#ui-system) — the general Banter SDK reference (`BanterUIPanel`, `UILabel`, `UIButton`, `UISlider`, `UIToggle`, `UIScrollView`, `UIVisualElement`, style properties) — applies here directly. `docs/setup-altspace-ui.md` layers the Altspace-specific parts on top: story-authoring format, the `SetStyles` shorthand-property restrictions, and the element quirks discovered while building this setup (including one only found by testing live in-world — see below).
 
 | | |
 |---|---|
@@ -475,7 +479,9 @@ Standalone demo (`public/altspace-ui-test.js`), independent of Storybook:
           src="http://[host]:3343/meta-preview-altspace-tetris-inject.js"></script>
   ```
 
-  Optional numeric attributes: `cols`, `rows`, `cellsize`, `dropms`, `startlevel` (defaults match the Storybook story). Controls are read from BS scene-level `key-press` events — **the exact `BS.KeyCode` string values are unverified against a real client** (no live Altspace access from where this was built); every `[tetris] key-press: <value>` is logged to the console so the mapping in the script can be corrected against real values on first in-world test.
+  Optional numeric attributes: `cols`, `rows`, `cellsize`, `dropms`, `startlevel` (defaults match the Storybook story). Controls are read from both real `UIButton`s (`OnClick`) and BS scene-level `key-press` events.
+
+  **Confirmed working live in Altspace** — gravity, movement, rotation, line clearing, the button sidebar, and the next-piece preview all run correctly in-world (screenshot above, right). Getting there surfaced one real, non-obvious bug: `el.SetProperty(BS.PN.text, value)` — the form `docs/sdk-banter.md` shows — does not render text on the real client (the label/button exists and is styled correctly, just no visible text); it has to be set as a direct property instead (`el.text = value`), matching the pattern the already-working `bantervr-ui-test.js` and `meta-preview-bantervr-inject.js` use. Full writeup in `docs/setup-altspace-ui.md`.
 
 See `docs/setup-altspace-ui.md` for the full story-authoring guide, style constraints, and element quirks (identical to `bantervr-ui`, since the UI Toolkit API is unchanged on the Altspace branch).
 

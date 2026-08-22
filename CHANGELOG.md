@@ -3,6 +3,8 @@
 ## Unreleased
 
 ### Added
+- `docs/screenshots/tetris.png` — Storybook preview next to the live AltspaceVR client, confirming the fix worked
+- README `altspace-ui` section expanded: leading screenshot, a reference to `docs/sdk-banter.md`'s UI System docs (the API is unchanged, so it applies directly), and an updated Tetris description confirming it works live in-world and covering the `SetProperty`-vs-`.text` bug found while testing it
 - `altspace-ui` setup — parallel fork of `bantervr-ui` targeting the `Altspace` branch of BanterSDK (SideQuest's internal rebrand, "SideQuest Creator SDK"). Confirmed via diff against `main` that the UI Toolkit component API (`BanterUIPanel`, `UILabel`, `UIButton`, `UISlider`, `UIToggle`, `UIScrollView`, `UIVisualElement`) is unchanged on that branch, so this is a straight copy (own stories, mock, meta-preview, inject script, test demo) kept independent so it can diverge later. Ports: Storybook 6016, relay 3343.
 - `src/storybook-channel.js` — new `window.__metaPreviewAltspaceUI` branch sending `altspaceUIHtml`/`altspaceUIData`
 - Relay updated to broadcast `story-rendered` messages to `altspace-inject` clients
