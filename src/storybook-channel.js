@@ -30,6 +30,7 @@ export const decorators = [
     window.__metaPreviewData       = null;
     window.__metaPreviewBrush      = null;
     window.__metaPreviewBanterUI   = null;
+    window.__metaPreviewAltspaceUI = null;
     window.__metaPreviewBanterVR3D = null;
     window.__metaPreviewTUI        = null;
     window.__metaPreviewSDF2D      = null;
@@ -140,6 +141,19 @@ export const decorators = [
           banterUIData: window.__metaPreviewBanterUI.sceneData,
         }));
         window.__metaPreviewBanterUI = null;
+        return;
+      }
+
+      if (window.__metaPreviewAltspaceUI) {
+        relay.send(JSON.stringify({
+          type: 'story-rendered',
+          storyId: context.id,
+          name: context.name,
+          kind: context.kind,
+          altspaceUIHtml: root.innerHTML,
+          altspaceUIData: window.__metaPreviewAltspaceUI.sceneData,
+        }));
+        window.__metaPreviewAltspaceUI = null;
         return;
       }
 

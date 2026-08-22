@@ -39,7 +39,11 @@
     "dev:sdf2d": "concurrently \"yarn relay:sdf2d\" \"yarn storybook:sdf2d\"",
     "relay:sdf3d": "PORT=3342 node src/relay.js",
     "storybook:sdf3d": "STORYBOOK_RELAY_PORT=3342 storybook dev -c .storybook-sdf3d -p 6015 --host 0.0.0.0",
-    "dev:sdf3d": "concurrently \"yarn relay:sdf3d\" \"yarn storybook:sdf3d\""
+    "dev:sdf3d": "concurrently \"yarn relay:sdf3d\" \"yarn storybook:sdf3d\"",
+    "storybook:altspace-ui": "STORYBOOK_RELAY_PORT=3343 storybook dev -c .storybook-altspace-ui -p 6016 --host 0.0.0.0",
+    "relay:altspace-ui": "PORT=3343 node src/relay.js",
+    "dev:altspace-ui": "concurrently \"yarn relay:altspace-ui\" \"yarn storybook:altspace-ui\"",
+    "build:altspace-ui": "storybook build -c .storybook-altspace-ui"
   },
   "dependencies": {
     "express": "^4.18.2",

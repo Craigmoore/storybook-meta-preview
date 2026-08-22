@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `altspace-ui` setup — parallel fork of `bantervr-ui` targeting the `Altspace` branch of BanterSDK (SideQuest's internal rebrand, "SideQuest Creator SDK"). Confirmed via diff against `main` that the UI Toolkit component API (`BanterUIPanel`, `UILabel`, `UIButton`, `UISlider`, `UIToggle`, `UIScrollView`, `UIVisualElement`) is unchanged on that branch, so this is a straight copy (own stories, mock, meta-preview, inject script, test demo) kept independent so it can diverge later. Ports: Storybook 6016, relay 3343.
+- `src/storybook-channel.js` — new `window.__metaPreviewAltspaceUI` branch sending `altspaceUIHtml`/`altspaceUIData`
+- Relay updated to broadcast `story-rendered` messages to `altspace-inject` clients
+- `docs/setup-altspace-ui.md` — full story-authoring guide, style constraints, and element quirks for the setup (mirrors `setup-bantervr-ui.md`); clarifies the two delivery pages: `meta-preview-altspace-ui.html` is a desktop-browser dev preview only, `meta-preview-altspace-inject.js` is the script that actually loads directly into Altspace via a `<script>` tag in the world's own `index.html`
+- README `altspace-ui` section and `docs/README.md` index updated to match
+
+### Fixed
+- `docs/README.md` — status table was stale: `threejs-2d`, `threejs-3d`, `audio`, `openbrush`, `bantervr-ui`, and `bantervr-3d` were all marked "🔲 planned" despite their doc files being fully written and those setups being implemented and documented in the top-level README; corrected to "✅ done". Added the missing `setup-tui.md` row (also done) and rows for `setup-sdf2d.md`/`setup-sdf3d.md` (genuinely not yet written). Added `story-hierarchy-audit.md` and `unity-uitoolkit.md`, which existed in `docs/` but weren't listed in the index.
+
 ## [0.17.4] - 2026-05-21
 
 ### Changed

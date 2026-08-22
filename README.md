@@ -431,6 +431,43 @@ Each story has a `display` control (`normals` / `solid` / `wireframe`), a `resol
 - `SDF3D / Organisms / Fractals` — MengerSponge (recursive cross-subtraction, iter 1–3), SierpinskiTetrahedron (IFS fold-scale, iter 1–6)
 - `SDF3D / Organisms / SweepCompositions` — SpiralStars (star discs stacked with increasing rotation), HelixCoil (circle profile swept along a helix path), TwinHelix (two intertwined helix strands), KaleidoscoPrism (2D polar-repeated egg profile extruded), StarWreath (star prisms around a revolve ring)
 
+### altspace-ui
+
+Parallel fork of `bantervr-ui` targeting the `Altspace` branch of BanterSDK (`~/dev/flashygraphics/projects/BanterSDK`) — SideQuest's internal rebrand of the SDK ("SideQuest Creator SDK", Unity 6000.3). As of that branch the UI Toolkit component API (`BanterUIPanel`, `UILabel`, `UIButton`, `UISlider`, `UIToggle`, `UIScrollView`, `UIVisualElement` and their properties) is unchanged from upstream Banter — the only UI-adjacent diffs are a new default theme stylesheet and an internal `PanelReady` C# event, neither of which affects the JS-facing API. This setup exists as its own named copy (own stories, mock, meta-preview, inject script) so it can diverge independently if Altspace's runtime changes later.
+
+| | |
+|---|---|
+| Storybook | `http://[host]:6016` |
+| Meta Preview | `http://[host]:3343/meta-preview-altspace-ui.html` |
+
+**Run:**
+```bash
+yarn dev:altspace-ui
+```
+
+**Two different pages — don't confuse them:**
+- `meta-preview-altspace-ui.html` — a desktop-browser dev preview. It renders the mock HTML approximation of whatever story is selected; it never calls the real `BS` API, even when `BS` is present.
+- `meta-preview-altspace-inject.js` — the piece that actually loads directly into Altspace. It's a self-contained script you embed via a `<script src="...">` tag in the world's own `index.html`; it connects to the relay and builds the real `BS.BanterUIPanel`/`UILabel`/`UIButton`/etc. objects in-world using the live BS API.
+
+**In-world setup:**
+
+Same pattern as `bantervr-ui` — add the inject script to the world's `index.html`:
+
+```html
+<script position="0 1.5 2" rotation="0 180 0" scale="1 1 1"
+        src="http://[host]:3343/meta-preview-altspace-inject.js"></script>
+```
+
+Standalone demo (`public/altspace-ui-test.js`), independent of Storybook:
+
+```html
+<script src="http://[host]:3343/altspace-ui-test.js"></script>
+```
+
+**Stories:** same set as `bantervr-ui` (Buttons, Labels, Inputs, VisualElement, ActionCard, ButtonGroup, Sliders, Toggles, ScrollView, SettingsPanel, GameLobby) under the `Altspace-UI` title namespace.
+
+See `docs/setup-altspace-ui.md` for the full story-authoring guide, style constraints, and element quirks (identical to `bantervr-ui`, since the UI Toolkit API is unchanged on the Altspace branch).
+
 ---
 
 ## Installation
@@ -525,5 +562,8 @@ public/
   meta-preview-sdf2d.html            # sdf2d meta-preview (WebGL2 fragment shader renderer)
   meta-preview-sdf3d.html                    # sdf3d meta-preview (Three.js mesh renderer, receives pre-tessellated geometry)
   meta-preview-bantervr-sdf3d-inject.js     # sdf3d in-world inject script — exposes paged geometry wire API as window globals, triggers Visual Script on each story render
+  meta-preview-altspace-ui.html       # altspace-ui meta-preview (parallel fork of bantervr-ui, targets BanterSDK's Altspace branch)
+  meta-preview-altspace-inject.js     # altspace-ui in-world inject script
+  altspace-ui-test.js                 # altspace-ui standalone demo / known-good reference
 setups.js                   # registry of all setups and their ports
 ```
