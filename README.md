@@ -433,9 +433,9 @@ Each story has a `display` control (`normals` / `solid` / `wireframe`), a `resol
 
 ### altspace-ui
 
-Parallel fork of `bantervr-ui` targeting the `Altspace` branch of BanterSDK (`~/dev/flashygraphics/projects/BanterSDK`) — SideQuest's internal rebrand of the SDK ("SideQuest Creator SDK", Unity 6000.3). As of that branch the UI Toolkit component API (`BanterUIPanel`, `UILabel`, `UIButton`, `UISlider`, `UIToggle`, `UIScrollView`, `UIVisualElement` and their properties) is unchanged from upstream Banter — the only UI-adjacent diffs are a new default theme stylesheet and an internal `PanelReady` C# event, neither of which affects the JS-facing API. This setup exists as its own named copy (own stories, mock, meta-preview, inject script) so it can diverge independently if Altspace's runtime changes later.
+![Block Drop, Storybook preview next to the same game running live in Altspace](docs/screenshots/blockdrop.png)
 
-Since the UI Toolkit API itself is unchanged, [`docs/sdk-banter.md`](docs/sdk-banter.md#ui-system) — the general Banter SDK reference (`BanterUIPanel`, `UILabel`, `UIButton`, `UISlider`, `UIToggle`, `UIScrollView`, `UIVisualElement`, style properties) — applies here directly. `docs/setup-altspace-ui.md` layers the Altspace-specific parts on top: story-authoring format, the `SetStyles` shorthand-property restrictions, and the element quirks discovered while building this setup (including one only found by testing live in-world — see below).
+Parallel fork of `bantervr-ui` targeting the `Altspace` branch of BanterSDK — SideQuest's internal rebrand of the SDK ("SideQuest Creator SDK"). The UI Toolkit component API is unchanged from upstream Banter, so this exists as its own named copy so it can diverge independently if that changes later.
 
 | | |
 |---|---|
@@ -447,59 +447,25 @@ Since the UI Toolkit API itself is unchanged, [`docs/sdk-banter.md`](docs/sdk-ba
 yarn dev:altspace-ui
 ```
 
-**Two different pages — don't confuse them:**
-- `meta-preview-altspace-ui.html` — a desktop-browser dev preview. It renders the mock HTML approximation of whatever story is selected; it never calls the real `BS` API, even when `BS` is present.
-- `meta-preview-altspace-inject.js` — the piece that actually loads directly into Altspace. It's a self-contained script you embed via a `<script src="...">` tag in the world's own `index.html`; it connects to the relay and builds the real `BS.BanterUIPanel`/`UILabel`/`UIButton`/etc. objects in-world using the live BS API.
-
 **In-world setup:**
-
-Same pattern as `bantervr-ui` — add the inject script to the world's `index.html`:
 
 ```html
 <script position="0 1.5 2" rotation="0 180 0" scale="1 1 1"
         src="http://[host]:3343/meta-preview-altspace-inject.js"></script>
 ```
 
-Standalone demo (`public/altspace-ui-test.js`), independent of Storybook:
+Standalone demo: `<script src="http://[host]:3343/altspace-ui-test.js"></script>`
 
-```html
-<script src="http://[host]:3343/altspace-ui-test.js"></script>
-```
+**Stories:** same set as `bantervr-ui` under the `Altspace-UI` title namespace, plus three built to prove out the atom → molecule → organism composition this project is about, not just to build a game:
+- `Altspace-UI / Atoms / Block` — a single coloured square, the primitive everything below is built from
+- `Altspace-UI / Molecules / Grid` — a configurable `rows`×`cols` grid of `Block`s
+- `Altspace-UI / Organisms / BlockDrop` — a fully playable falling-block puzzle game composed from `Grid` and shared `makeLabel`/`makeButton` atoms, with a right-hand button sidebar and keyboard controls. Confirmed working live in Altspace. Needs a dedicated in-world script (`meta-preview-altspace-blockdrop-inject.js`), since it's the only story here that's continuously animating and keyboard-driven rather than a static per-selection snapshot.
 
-**Stories:** same set as `bantervr-ui` (Buttons, Labels, Inputs, VisualElement, ActionCard, ButtonGroup, Sliders, Toggles, ScrollView, SettingsPanel, GameLobby) under the `Altspace-UI` title namespace, plus three `altspace-ui`-only additions built to prove out the atom → molecule → organism composition this project is actually about, not just to build a game:
-
-- `Altspace-UI / Atoms / Block` — a single coloured square (`UIVisualElement`), controls for `size` and `color`. The primitive everything below is built from.
-- `Altspace-UI / Molecules / Grid` — a configurable `rows`×`cols` grid of `Block`s (`emptyColor`, `fillColor`, `cellSize`, `gap`, and a `pattern` select to prove it's a genuine reusable grid, not a BlockDrop-specific one-off). Composed from `Block` via `makeGrid()` in `molecules/components.js`, the same way `GameLobby` composes `makeStatusBadge`/`makePlayerRow`/etc.
-- `Altspace-UI / Organisms / BlockDrop` — a fully playable falling-block puzzle game, composed from `Grid` (board + next-piece preview) and shared `makeLabel`/`makeButton` atom constructors (`src/altspace-ui/atoms/components.js`) rather than hand-rolled `UIVisualElement`/`UILabel`/`UIButton` calls — this was the actual point of the exercise: prove the composition works for something non-trivial, not just build a game. Right-hand sidebar with the next-piece preview and six `UIButton`s — Left, Right, Rotate left, Rotate right, Drop, Restart — alongside keyboard controls (arrow keys to move, ↑/X to rotate right, Z to rotate left, Space to hard-drop, P to pause, R to restart). Full gameplay (wall-kicks, line clearing, scoring, level speed-up, game over/restart) in the Storybook preview and the meta-preview page. Everything configurable is a control: `cellSize`, `gap`, `dropIntervalMs`, `cols`, `rows`, `startLevel`, `emptyColor`, and all seven piece colours (`colorI`…`colorL`) — changing any of them resets the game with the new values, since Storybook re-runs the story's `render()` from scratch on every arg change.
-
-  Deliberately named and coloured to stay clear of trademark/trade-dress issues associated with the classic falling-block puzzle genre: the seven piece colours default to a permutation that avoids the well-known official shape-to-colour pairing (I≠cyan, O≠yellow, T≠purple, S≠green, Z≠red, J≠blue, L≠orange) — the underlying mechanic itself isn't protectable, but a name and a specific colour scheme can be. Since the colours are now controls, that default can be changed anyway.
-
-  Playing it live in-world on Altspace needs a **third, dedicated file** — `public/meta-preview-altspace-blockdrop-inject.js` — rather than the generic inject script. `meta-preview-altspace-inject.js` only ever pushes one static snapshot per Storybook story selection (that's true of every other setup here too), which can't drive a continuously-animating, keyboard-controlled game, so this script's *gameplay* stays entirely self-contained once running — its own game loop and input handling, never driven frame-by-frame by anything from the relay. But it does connect to the relay, purely to know **when to spawn and despawn**: the panel appears the moment BlockDrop's own story is selected in Storybook and disappears the instant any other story is selected, the same as every other story implicitly behaves via the generic script's destroy-then-rebuild cycle — it does not sit in-world permanently regardless of what's selected. It can't `import` the shared `atoms/components.js`/`molecules/components.js` modules either, since it's a raw `<script>` tag with no bundler — it stays structurally consistent with the Storybook side but necessarily duplicates the construction logic locally.
-
-  One consequence worth knowing: since spawning depends on a relay message, BlockDrop won't appear at all unless `yarn dev:altspace-ui` (or at least `yarn relay:altspace-ui`) is running and BlockDrop's story has been selected in Storybook at least once — it's not available offline the way a truly standalone script would be. That said, the relay now remembers the most recent `story-rendered` payload and resends it immediately to any client that (re)connects afterwards, so a fresh world load or reconnect no longer needs someone to reselect a story in Storybook first — applies to every setup, not just this one.
-
-  BlockDrop's tag takes no `position`/`rotation` — it and the generic inject script are mutually exclusive occupants of the same spot (only one is ever actually showing a panel), so BlockDrop looks up the generic script's own tag and reads position/rotation from there instead of needing a second copy kept in sync by hand:
-
-  ```html
-  <script position="0 1.5 2" rotation="0 180 0" scale="1 1 1"
-          src="http://[host]:3343/meta-preview-altspace-inject.js"></script>
-  <script scale="1 1 1"
-          src="http://[host]:3343/meta-preview-altspace-blockdrop-inject.js"></script>
-  ```
-
-  Optional attributes (defaults match the Storybook story): numeric — `cols`, `rows`, `cellsize`, `gap`, `dropms`, `startlevel`; colour — `emptycolor`, `colori`, `coloro`, `colort`, `colors`, `colorz`, `colorj`, `colorl` (the in-world equivalent of the Storybook colour controls, since there's no Storybook UI available in-world). Controls are read from both real `UIButton`s (`OnClick`) and BS scene-level `key-press` events.
-
-  `gap` defaults to `2` (not `1`) for both the story and the in-world script — a 1px gap can round to 0 or 1 physical pixel inconsistently per cell on a scaled world-space Altspace panel (confirmed live in-world: identical code, some cells showed a gap and some didn't, never reproducible in the browser mock). 2px sits far enough from that rounding boundary to render consistently; it's a control/attribute rather than a fixed constant since it's worth tuning per `cellSize`.
-
-  **Confirmed working live in Altspace** — gravity, movement, rotation, line clearing, the button sidebar, and the next-piece preview all run correctly in-world. Getting there surfaced two real, non-obvious bugs, both now baked into the shared `makeLabel`/`makeButton` constructors so future organisms get the fixes for free: `el.SetProperty(BS.PN.text, value)` — the form `docs/sdk-banter.md` shows — does not render text on the real client (the label/button exists and is styled correctly, just no visible text; needs `el.text = value` instead), and `UIButton` needs its `backgroundColor`/`borderWidth`/`borderColor`/`borderRadius` set explicitly (the Storybook mock defaults these for free, the real one doesn't). Full writeup in `docs/setup-altspace-ui.md`.
-
-  ![Block Drop, Storybook preview next to the same game running live in Altspace](docs/screenshots/blockdrop.png)
-
-See `docs/setup-altspace-ui.md` for the full story-authoring guide, style constraints, and element quirks (identical to `bantervr-ui`, since the UI Toolkit API is unchanged on the Altspace branch).
+See `docs/setup-altspace-ui.md` for the full story-authoring guide, style constraints, element quirks, and the BlockDrop spawn/despawn lifecycle.
 
 ### altspace-3d
 
-Parallel fork of `bantervr-3d` targeting the same `Altspace` branch of BanterSDK as `altspace-ui`. The 3D geometry/material component API (`BanterBox`, `BanterSphere`, `BanterCylinder`, `BanterCone`, `BanterTorus`, `BanterTorusKnot`, `BanterMaterial`) is confirmed byte-for-byte unchanged from upstream Banter on that branch — checked by diffing the relevant C# component files directly against `main`, not just confirming the classes exist. Rebrand-only fork: naming and paths changed, nothing about the mock/inject/serialisation logic.
+Parallel fork of `bantervr-3d` targeting the same `Altspace` branch of BanterSDK as `altspace-ui`. The 3D geometry/material component API is confirmed unchanged from upstream Banter on that branch — a rebrand-only fork, own stories/mock/inject/demo.
 
 | | |
 |---|---|
@@ -519,21 +485,14 @@ yarn dev:altspace-3d
         src="https://[host]:33440/meta-preview-altspace-inject-3d.js"></script>
 ```
 
-Unlike `altspace-ui`'s `BlockDrop`, this setup has only one inject script and nothing else competing for the same in-world spot, so it keeps its own independent `position`/`rotation`/`scale` tag attributes rather than deriving them from another tag.
+Standalone demo: `<script src="https://[host]:33440/altspace-3d-test.js"></script>`
 
-To verify the pipeline independently of Storybook:
-```html
-<script src="https://[host]:33440/altspace-3d-test.js"></script>
-```
-
-**Stories:** same set as `bantervr-3d` (Primitives, Volumes, Fractals) under the `Altspace-3D` title namespace:
+**Stories:** same set as `bantervr-3d` under the `Altspace-3D` title namespace:
 - `Altspace-3D / Atoms / Primitives` — Box, Sphere, Cylinder, Cone, Torus, TorusKnot; each with colour picker and size range controls
 - `Altspace-3D / Molecules / Volumes` — all six primitives in a row
 - `Altspace-3D / Molecules / Fractals` — FractalTree, SierpinskiTetrahedron, MengerSponge
 
-Verified end-to-end with a real WebSocket client against the running relay: selecting a story produces a `story-rendered` message carrying `altspace3DData` (not the generic `html` field), matching the shape the inject script expects. Not yet confirmed live in Altspace itself — the actual `BS` construction code in `meta-preview-altspace-inject-3d.js` is untouched from `bantervr-3d`'s already-working version, so it should behave identically.
-
-See `docs/setup-altspace-3d.md` for the full write-up, including the wire-protocol table and a note on a pre-existing `bantervr-3d` bug found and fixed while building this fork (its Storybook config referenced a `organisms/` story directory that was never created, breaking `yarn storybook:bantervr-3d` outright).
+Confirmed working live in Altspace. See `docs/setup-altspace-3d.md` for the full write-up, including a pre-existing `bantervr-3d` bug found and fixed while building this fork, and why the inject script avoids Banter's `parent` GameObject option entirely.
 
 ---
 
@@ -615,25 +574,25 @@ src/
     molecules/
     organisms/
 public/
-  meta-preview.html                  # html setup meta-preview
-  meta-preview-threejs-2d.html       # threejs-2d meta-preview
-  meta-preview-threejs-3d.html       # threejs-3d meta-preview (with OrbitControls)
-  meta-preview-audio.html            # audio meta-preview (Tone.js player)
-  meta-preview-openbrush.html        # openbrush meta-preview (HTTP API sender)
-  meta-preview-bantervr-ui.html      # bantervr-ui meta-preview
-  meta-preview-bantervr-inject.js    # bantervr-ui in-world inject script
-  bantervr-ui-test.js                # bantervr-ui standalone demo / known-good reference
-  meta-preview-bantervr-inject-3d.js # bantervr-3d in-world inject script
-  bantervr-3d-test.js                # bantervr-3d standalone demo / known-good reference
-  meta-preview-tui.html              # tui meta-preview (xterm.js terminal, ANSI rendering)
-  meta-preview-sdf2d.html            # sdf2d meta-preview (WebGL2 fragment shader renderer)
+  meta-preview.html                          # html setup meta-preview
+  meta-preview-threejs-2d.html               # threejs-2d meta-preview
+  meta-preview-threejs-3d.html               # threejs-3d meta-preview (with OrbitControls)
+  meta-preview-audio.html                    # audio meta-preview (Tone.js player)
+  meta-preview-openbrush.html                # openbrush meta-preview (HTTP API sender)
+  meta-preview-bantervr-ui.html              # bantervr-ui meta-preview
+  meta-preview-bantervr-inject.js            # bantervr-ui in-world inject script
+  bantervr-ui-test.js                        # bantervr-ui standalone demo / known-good reference
+  meta-preview-bantervr-inject-3d.js         # bantervr-3d in-world inject script
+  bantervr-3d-test.js                        # bantervr-3d standalone demo / known-good reference
+  meta-preview-tui.html                      # tui meta-preview (xterm.js terminal, ANSI rendering)
+  meta-preview-sdf2d.html                    # sdf2d meta-preview (WebGL2 fragment shader renderer)
   meta-preview-sdf3d.html                    # sdf3d meta-preview (Three.js mesh renderer, receives pre-tessellated geometry)
-  meta-preview-bantervr-sdf3d-inject.js     # sdf3d in-world inject script — exposes paged geometry wire API as window globals, triggers Visual Script on each story render
-  meta-preview-altspace-ui.html       # altspace-ui meta-preview (parallel fork of bantervr-ui, targets BanterSDK's Altspace branch)
-  meta-preview-altspace-inject.js     # altspace-ui in-world inject script
-  meta-preview-altspace-blockdrop-inject.js # BlockDrop's dedicated in-world script — own spawn/despawn lifecycle
-  altspace-ui-test.js                 # altspace-ui standalone demo / known-good reference
-  meta-preview-altspace-inject-3d.js  # altspace-3d in-world inject script (parallel fork of bantervr-3d's)
-  altspace-3d-test.js                 # altspace-3d standalone demo / known-good reference
+  meta-preview-bantervr-sdf3d-inject.js      # sdf3d in-world inject script — exposes paged geometry wire API as window globals, triggers Visual Script on each story render
+  meta-preview-altspace-ui.html              # altspace-ui meta-preview (parallel fork of bantervr-ui, targets BanterSDK's Altspace branch)
+  meta-preview-altspace-inject.js            # altspace-ui in-world inject script
+  meta-preview-altspace-blockdrop-inject.js  # BlockDrop's dedicated in-world script — own spawn/despawn lifecycle
+  altspace-ui-test.js                        # altspace-ui standalone demo / known-good reference
+  meta-preview-altspace-inject-3d.js         # altspace-3d in-world inject script (parallel fork of bantervr-3d's)
+  altspace-3d-test.js                        # altspace-3d standalone demo / known-good reference
 setups.js                   # registry of all setups and their ports
 ```
