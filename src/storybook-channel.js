@@ -32,6 +32,7 @@ export const decorators = [
     window.__metaPreviewBanterUI   = null;
     window.__metaPreviewAltspaceUI = null;
     window.__metaPreviewBanterVR3D = null;
+    window.__metaPreviewAltspace3D = null;
     window.__metaPreviewTUI        = null;
     window.__metaPreviewSDF2D      = null;
     window.__metaPreviewSDF3D      = null;
@@ -89,6 +90,18 @@ export const decorators = [
           banterVR3DData: window.__metaPreviewBanterVR3D.sceneData,
         }));
         window.__metaPreviewBanterVR3D = null;
+        return;
+      }
+
+      if (window.__metaPreviewAltspace3D) {
+        relay.send(JSON.stringify({
+          type:          'story-rendered',
+          storyId:       context.id,
+          name:          context.name,
+          kind:          context.kind,
+          altspace3DData: window.__metaPreviewAltspace3D.sceneData,
+        }));
+        window.__metaPreviewAltspace3D = null;
         return;
       }
 

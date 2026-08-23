@@ -43,7 +43,11 @@
     "storybook:altspace-ui": "STORYBOOK_RELAY_PORT=3343 storybook dev -c .storybook-altspace-ui -p 6016 --host 0.0.0.0",
     "relay:altspace-ui": "PORT=3343 node src/relay.js",
     "dev:altspace-ui": "concurrently \"yarn relay:altspace-ui\" \"yarn storybook:altspace-ui\"",
-    "build:altspace-ui": "storybook build -c .storybook-altspace-ui"
+    "build:altspace-ui": "storybook build -c .storybook-altspace-ui",
+    "storybook:altspace-3d": "STORYBOOK_RELAY_PORT=3344 storybook dev -c .storybook-altspace-3d -p 6017 --host 0.0.0.0",
+    "relay:altspace-3d": "PORT=3344 node src/relay.js",
+    "dev:altspace-3d": "concurrently \"yarn relay:altspace-3d\" \"yarn storybook:altspace-3d\"",
+    "build:altspace-3d": "storybook build -c .storybook-altspace-3d"
   },
   "dependencies": {
     "express": "^4.18.2",

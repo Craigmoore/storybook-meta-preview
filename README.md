@@ -497,6 +497,44 @@ Standalone demo (`public/altspace-ui-test.js`), independent of Storybook:
 
 See `docs/setup-altspace-ui.md` for the full story-authoring guide, style constraints, and element quirks (identical to `bantervr-ui`, since the UI Toolkit API is unchanged on the Altspace branch).
 
+### altspace-3d
+
+Parallel fork of `bantervr-3d` targeting the same `Altspace` branch of BanterSDK as `altspace-ui`. The 3D geometry/material component API (`BanterBox`, `BanterSphere`, `BanterCylinder`, `BanterCone`, `BanterTorus`, `BanterTorusKnot`, `BanterMaterial`) is confirmed byte-for-byte unchanged from upstream Banter on that branch — checked by diffing the relevant C# component files directly against `main`, not just confirming the classes exist. Rebrand-only fork: naming and paths changed, nothing about the mock/inject/serialisation logic.
+
+| | |
+|---|---|
+| Storybook | `http://[host]:6017` |
+| Relay | `http://[host]:3344` |
+| Inject / demo (HTTPS) | `https://[host]:33440` |
+
+**Run:**
+```bash
+yarn dev:altspace-3d
+```
+
+**In-world setup:**
+
+```html
+<script position="0 1.5 2" rotation="0 0 0" scale="1 1 1"
+        src="https://[host]:33440/meta-preview-altspace-inject-3d.js"></script>
+```
+
+Unlike `altspace-ui`'s `BlockDrop`, this setup has only one inject script and nothing else competing for the same in-world spot, so it keeps its own independent `position`/`rotation`/`scale` tag attributes rather than deriving them from another tag.
+
+To verify the pipeline independently of Storybook:
+```html
+<script src="https://[host]:33440/altspace-3d-test.js"></script>
+```
+
+**Stories:** same set as `bantervr-3d` (Primitives, Volumes, Fractals) under the `Altspace-3D` title namespace:
+- `Altspace-3D / Atoms / Primitives` — Box, Sphere, Cylinder, Cone, Torus, TorusKnot; each with colour picker and size range controls
+- `Altspace-3D / Molecules / Volumes` — all six primitives in a row
+- `Altspace-3D / Molecules / Fractals` — FractalTree, SierpinskiTetrahedron, MengerSponge
+
+Verified end-to-end with a real WebSocket client against the running relay: selecting a story produces a `story-rendered` message carrying `altspace3DData` (not the generic `html` field), matching the shape the inject script expects. Not yet confirmed live in Altspace itself — the actual `BS` construction code in `meta-preview-altspace-inject-3d.js` is untouched from `bantervr-3d`'s already-working version, so it should behave identically.
+
+See `docs/setup-altspace-3d.md` for the full write-up, including the wire-protocol table and a note on a pre-existing `bantervr-3d` bug found and fixed while building this fork (its Storybook config referenced a `organisms/` story directory that was never created, breaking `yarn storybook:bantervr-3d` outright).
+
 ---
 
 ## Installation
@@ -593,6 +631,9 @@ public/
   meta-preview-bantervr-sdf3d-inject.js     # sdf3d in-world inject script — exposes paged geometry wire API as window globals, triggers Visual Script on each story render
   meta-preview-altspace-ui.html       # altspace-ui meta-preview (parallel fork of bantervr-ui, targets BanterSDK's Altspace branch)
   meta-preview-altspace-inject.js     # altspace-ui in-world inject script
+  meta-preview-altspace-blockdrop-inject.js # BlockDrop's dedicated in-world script — own spawn/despawn lifecycle
   altspace-ui-test.js                 # altspace-ui standalone demo / known-good reference
+  meta-preview-altspace-inject-3d.js  # altspace-3d in-world inject script (parallel fork of bantervr-3d's)
+  altspace-3d-test.js                 # altspace-3d standalone demo / known-good reference
 setups.js                   # registry of all setups and their ports
 ```

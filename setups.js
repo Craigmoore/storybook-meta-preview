@@ -20,4 +20,5 @@ export const setups = {
   'sdf2d':       { storybookPort: 6014, relayPort: 3341 },
   'sdf3d':       { storybookPort: 6015, relayPort: 3342 },
   'altspace-ui': { storybookPort: 6016, relayPort: 3343 },
+  'altspace-3d': { storybookPort: 6017, relayPort: 3344 },
 };

@@ -26,6 +26,7 @@ One file per named setup — purpose, ports, story format, meta-preview behaviou
 | `setup-bantervr-3d.md` | bantervr-3d | ✅ done |
 | `setup-tui.md` | tui | ✅ done |
 | `setup-altspace-ui.md` | altspace-ui | ✅ done |
+| `setup-altspace-3d.md` | altspace-3d | ✅ done |
 | `setup-sdf2d.md` | sdf2d | 🔲 not written — see the `sdf2d` section in the top-level README instead |
 | `setup-sdf3d.md` | sdf3d | 🔲 not written — see the `sdf3d` section in the top-level README instead |
 
@@ -41,5 +42,5 @@ API references for every external library used across setups.
 | `sdk-tonejs.md` | Tone.js | audio |
 | `sdk-tonaljs.md` | Tonal.js | audio |
 | `sdk-openbrush.md` | Open Brush HTTP API | openbrush |
-| `sdk-banter.md` | BanterVR SDK | bantervr-ui, bantervr-3d, altspace-ui |
+| `sdk-banter.md` | BanterVR SDK | bantervr-ui, bantervr-3d, altspace-ui, altspace-3d |
 | `unity-uitoolkit.md` | Unity UI Toolkit (`UnityEngine.UIElements`) | bantervr-ui, bantervr-3d, altspace-ui (underlies the BanterUI panel system) |

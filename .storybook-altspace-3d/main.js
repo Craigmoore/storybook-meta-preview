@@ -1,8 +1,8 @@
 /** @type {import('@storybook/html-webpack5').StorybookConfig} */
 const config = {
   stories: [
-    '../src/bantervr-3d/atoms/**/*.stories.js',
-    '../src/bantervr-3d/molecules/**/*.stories.js',
+    '../src/altspace-3d/atoms/**/*.stories.js',
+    '../src/altspace-3d/molecules/**/*.stories.js',
   ],
   addons: ['@storybook/addon-essentials'],
   framework: {
