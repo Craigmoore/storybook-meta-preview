@@ -1,25 +1,28 @@
 import { altspaceUiStory } from '../story.js';
+import { makeLabel, makeButton } from '../atoms/components.js';
+import { makeGrid } from '../molecules/components.js';
 
-export default { title: 'Altspace-UI/Organisms/Tetris' };
+export default { title: 'Altspace-UI/Organisms/BlockDrop' };
 
-const range = (min, max, step = 1) => ({ control: { type: 'range', min, max, step } });
+const range  = (min, max, step = 1) => ({ control: { type: 'range', min, max, step } });
 
-const GAP = 1;
 const NEXT_SIZE = 4;
 
-// ─── Piece definitions ──────────────────────────────────────────────────────
+// ─── Piece geometry ──────────────────────────────────────────────────────────
 // Each piece is authored as its 0°-rotation grid; the other three rotations
 // are derived by rotating the grid 90° clockwise, so there's no hand-typed
-// coordinate table to get wrong.
+// coordinate table to get wrong. Colour is deliberately NOT baked in here —
+// it's a per-render Storybook control (see argTypes below), so the shape
+// table only needs to be built once at module load.
 
-const PIECE_DEFS = {
-  I: { color: '#22d3ee', grid: ['....', '####', '....', '....'] },
-  O: { color: '#fbbf24', grid: ['##', '##'] },
-  T: { color: '#a855f7', grid: ['.#.', '###', '...'] },
-  S: { color: '#4ade80', grid: ['.##', '##.', '...'] },
-  Z: { color: '#f87171', grid: ['##.', '.##', '...'] },
-  J: { color: '#60a5fa', grid: ['#..', '###', '...'] },
-  L: { color: '#fb923c', grid: ['..#', '###', '...'] },
+const PIECE_GRIDS = {
+  I: ['....', '####', '....', '....'],
+  O: ['##', '##'],
+  T: ['.#.', '###', '...'],
+  S: ['.##', '##.', '...'],
+  Z: ['##.', '.##', '...'],
+  J: ['#..', '###', '...'],
+  L: ['..#', '###', '...'],
 };
 
 function toCoords(grid) {
@@ -41,51 +44,117 @@ function rotateGridCW(grid) {
   return out.map((row) => row.join(''));
 }
 
-const SHAPES = {};
-for (const [type, def] of Object.entries(PIECE_DEFS)) {
+const SHAPE_ROTATIONS = {};
+for (const [type, grid0] of Object.entries(PIECE_GRIDS)) {
   const rotations = [];
-  let grid = def.grid;
+  let grid = grid0;
   for (let i = 0; i < 4; i++) {
     rotations.push(toCoords(grid));
     grid = rotateGridCW(grid);
   }
-  SHAPES[type] = { color: def.color, size: def.grid.length, rotations };
+  SHAPE_ROTATIONS[type] = { size: grid0.length, rotations };
 }
 
-const EMPTY_COLOR = '#181b26';
-const LINE_SCORES  = [0, 100, 300, 500, 800];
+const LINE_SCORES = [0, 100, 300, 500, 800];
 
-// ─── Tetris (playable) ──────────────────────────────────────────────────────
+// Colour-to-shape defaults deliberately do NOT match the well-known Tetris
+// Guideline assignment (I=cyan, O=yellow, T=purple, S=green, Z=red, J=blue,
+// L=orange) — every shape below defaults to a different one of the same
+// seven hues, to stay clear of that trade dress. All of them, plus the
+// empty-cell colour, are exposed as controls so the whole palette is
+// genuinely configurable, not just hard-coded past this default.
+const DEFAULT_COLORS = {
+  I: '#fb923c', O: '#a855f7', T: '#22d3ee', S: '#60a5fa',
+  Z: '#4ade80', J: '#f87171', L: '#fbbf24',
+};
 
-export const Tetris = {
-  args: { cellSize: 16, dropIntervalMs: 500, cols: 10, rows: 18, startLevel: 1 },
+// ─── Block Drop (playable) ───────────────────────────────────────────────────
+
+export const BlockDrop = {
+  args: {
+    cellSize: 16, gap: 2, dropIntervalMs: 500, cols: 10, rows: 18, startLevel: 1,
+    emptyColor: '#181b26',
+    colorI: DEFAULT_COLORS.I, colorO: DEFAULT_COLORS.O, colorT: DEFAULT_COLORS.T,
+    colorS: DEFAULT_COLORS.S, colorZ: DEFAULT_COLORS.Z, colorJ: DEFAULT_COLORS.J,
+    colorL: DEFAULT_COLORS.L,
+  },
   argTypes: {
     cellSize:       range(10, 24, 1),
+    // Default bumped from a hardcoded 1px: on a world-space Altspace panel,
+    // a 1px gap can round to 0 or 1 physical pixel inconsistently per cell
+    // (confirmed live in-world — some cells showed a gap, some didn't, with
+    // identical code, never reproducible in the browser mock). 2px is far
+    // enough from that rounding boundary to render consistently; exposed as
+    // a control rather than just bumping the constant, since it's genuinely
+    // something worth tuning per cellSize/panel scale.
+    gap:            range(1, 6, 1),
     dropIntervalMs: range(150, 1000, 50),
     cols:           range(6, 14, 1),
     rows:           range(10, 24, 1),
     startLevel:     range(1, 10, 1),
+    emptyColor:     { control: 'color' },
+    colorI:         { control: 'color' },
+    colorO:         { control: 'color' },
+    colorT:         { control: 'color' },
+    colorS:         { control: 'color' },
+    colorZ:         { control: 'color' },
+    colorJ:         { control: 'color' },
+    colorL:         { control: 'color' },
   },
   // Every arg change causes Storybook to call this render() again from
-  // scratch, so any control change (cols/rows/cellSize/dropIntervalMs/
-  // startLevel) naturally resets the game with the new values applied —
-  // there's no separate "apply settings" step, changing a control IS the reset.
-  render: ({ cellSize, dropIntervalMs, cols, rows, startLevel }) => altspaceUiStory((scene, BS) => {
+  // scratch, so any control change (board size, speed, or any of the eight
+  // colours) naturally resets the game with the new values applied — there's
+  // no separate "apply settings" step, changing a control IS the reset.
+  render: ({
+    cellSize, gap, dropIntervalMs, cols, rows, startLevel, emptyColor,
+    colorI, colorO, colorT, colorS, colorZ, colorJ, colorL,
+  }) => altspaceUiStory((scene, BS) => {
     const COLS = cols;
     const ROWS = rows;
-    const boardWidth   = COLS * (cellSize + GAP);
-    const boardHeight   = ROWS * (cellSize + GAP);
-    const sidebarWidth = Math.max(NEXT_SIZE * (cellSize + GAP), 88);
+    const EMPTY_COLOR = emptyColor;
+
+    const pieceColors = { I: colorI, O: colorO, T: colorT, S: colorS, Z: colorZ, J: colorJ, L: colorL };
+    const SHAPES = {};
+    for (const [type, shape] of Object.entries(SHAPE_ROTATIONS)) {
+      SHAPES[type] = { ...shape, color: pieceColors[type] };
+    }
+
+    // A BanterUIPanel's resolution is fixed at construction and can never
+    // resize to fit content afterward, so every label that contributes to
+    // the height budget below gets an explicit height (applied to the
+    // actual element further down) rather than being left to auto-size from
+    // its font — auto-sized labels are a guess Unity might measure
+    // differently, and any mismatch under a tight budget shows up as
+    // visible squishing (confirmed live in-world twice: once on a label
+    // that changed from empty to populated, once on the next-piece preview
+    // simply from the sidebar's total being a few px tighter than assumed).
+    // Naming these once and reusing them in both the budget math and the
+    // elements themselves means they can't drift apart again.
+    const TITLE_HEIGHT       = 24;
+    const STATS_HEIGHT       = 16;
+    const NEXT_LABEL_HEIGHT  = 14;
+    const STATUS_HEIGHT      = 16;
+    const HINT_HEIGHT        = 12;
+    const BUTTON_HEIGHT      = 30;
+
+    const boardWidth   = COLS * (cellSize + gap);
+    const boardHeight   = ROWS * (cellSize + gap);
+    const sidebarWidth = Math.max(NEXT_SIZE * (cellSize + gap), 88);
     const contentWidth  = boardWidth + 10 + sidebarWidth;
     const panelWidth    = Math.max(contentWidth + 60, 260);
     // Sidebar can be taller than the board at small rows/cellSize (6 buttons
     // + next-piece preview), so panel height has to fit whichever is taller.
     const SIDEBAR_BUTTON_COUNT = 6;
-    const SIDEBAR_BUTTON_BLOCK = 36; // 30px button height + 6px marginBottom
-    const sidebarContentHeight = 19 + NEXT_SIZE * (cellSize + GAP) + 10 + SIDEBAR_BUTTON_COUNT * SIDEBAR_BUTTON_BLOCK;
-    const panelHeight = Math.max(boardHeight, sidebarContentHeight) + 140;
+    const SIDEBAR_BUTTON_BLOCK = BUTTON_HEIGHT + 6; // + marginBottom
+    const sidebarContentHeight =
+      NEXT_LABEL_HEIGHT + 4 + NEXT_SIZE * (cellSize + gap) + 10 + SIDEBAR_BUTTON_COUNT * SIDEBAR_BUTTON_BLOCK;
+    const chromeHeight =
+      20 /* root padding */ + TITLE_HEIGHT + 6 + STATS_HEIGHT + 8 + 8 /* boardEl padding */
+      + STATUS_HEIGHT + 4 + HINT_HEIGHT
+      + 20 /* safety margin for anything still not accounted for exactly */;
+    const panelHeight = Math.max(boardHeight, sidebarContentHeight) + chromeHeight;
 
-    const obj       = new BS.GameObject({ name: 'Tetris' });
+    const obj       = new BS.GameObject({ name: 'BlockDrop' });
     const wrapperEl = obj._el;
     const panel     = obj.AddComponent(new BS.BanterUIPanel({ resolution: new BS.Vector2(panelWidth, panelHeight) }));
 
@@ -98,12 +167,9 @@ export const Tetris = {
     panel.root.style.paddingBottom   = '10px';
     panel.root.style.paddingLeft     = '10px';
 
-    const title = new BS.UILabel();
-    title.SetProperty(BS.PN.text, 'TETRIS');
-    title.style.fontSize        = '18px';
-    title.style.color           = '#ffffff';
-    title.style.backgroundColor = 'rgba(0,0,0,0)';
-    title.style.marginBottom    = '6px';
+    const title = makeLabel(BS, 'BLOCK DROP', { fontSize: 18, color: '#ffffff' });
+    title.style.height       = `${TITLE_HEIGHT}px`;
+    title.style.marginBottom = '6px';
     panel.root.AppendChild(title);
 
     const statsRow = new BS.UIVisualElement();
@@ -114,27 +180,25 @@ export const Tetris = {
     statsRow.style.marginBottom   = '8px';
     panel.root.AppendChild(statsRow);
 
-    function makeStatLabel() {
-      const l = new BS.UILabel();
-      l.style.fontSize        = '12px';
-      l.style.color           = '#9ca3af';
-      l.style.backgroundColor = 'rgba(0,0,0,0)';
-      statsRow.AppendChild(l);
-      return l;
-    }
-    const scoreLabel = makeStatLabel();
-    const linesLabel = makeStatLabel();
-    const levelLabel = makeStatLabel();
+    const statLabelStyle = { fontSize: 12, color: '#9ca3af' };
+    const scoreLabel = makeLabel(BS, 'Score: 0', statLabelStyle);
+    const linesLabel = makeLabel(BS, 'Lines: 0', statLabelStyle);
+    const levelLabel = makeLabel(BS, `Level: ${startLevel}`, statLabelStyle);
+    for (const l of [scoreLabel, linesLabel, levelLabel]) l.style.height = `${STATS_HEIGHT}px`;
+    statsRow.AppendChild(scoreLabel);
+    statsRow.AppendChild(linesLabel);
+    statsRow.AppendChild(levelLabel);
 
     const mainRow = new BS.UIVisualElement();
     mainRow.style.display       = 'flex';
     mainRow.style.flexDirection = 'row';
     panel.root.AppendChild(mainRow);
 
+    // ─── Board — Molecules/Grid, framed with a background/padding wrapper ──
+
     const boardEl = new BS.UIVisualElement();
     boardEl.style.display         = 'flex';
     boardEl.style.flexDirection   = 'column';
-    boardEl.style.width           = `${boardWidth}px`;
     boardEl.style.backgroundColor = '#0b0d14';
     boardEl.style.paddingTop      = '4px';
     boardEl.style.paddingRight    = '4px';
@@ -143,28 +207,12 @@ export const Tetris = {
     boardEl.style.marginRight     = '10px';
     mainRow.AppendChild(boardEl);
 
-    const cells = [];
-    for (let r = 0; r < ROWS; r++) {
-      const rowEl = new BS.UIVisualElement();
-      rowEl.style.display       = 'flex';
-      rowEl.style.flexDirection = 'row';
-      boardEl.AppendChild(rowEl);
+    const { el: boardGridEl, cells } = makeGrid(BS, {
+      rows: ROWS, cols: COLS, cellSize, gap, getColor: () => EMPTY_COLOR,
+    });
+    boardEl.AppendChild(boardGridEl);
 
-      const rowCells = [];
-      for (let c = 0; c < COLS; c++) {
-        const cell = new BS.UIVisualElement();
-        cell.style.width           = `${cellSize}px`;
-        cell.style.height          = `${cellSize}px`;
-        cell.style.backgroundColor = EMPTY_COLOR;
-        cell.style.marginRight     = `${GAP}px`;
-        cell.style.marginBottom    = `${GAP}px`;
-        rowEl.AppendChild(cell);
-        rowCells.push(cell);
-      }
-      cells.push(rowCells);
-    }
-
-    // ─── Right-hand sidebar: next-piece preview + control buttons ──────────
+    // ─── Right-hand sidebar: next-piece preview (Molecules/Grid) + buttons ─
 
     const sidebar = new BS.UIVisualElement();
     sidebar.style.display       = 'flex';
@@ -172,76 +220,57 @@ export const Tetris = {
     sidebar.style.width         = `${sidebarWidth}px`;
     mainRow.AppendChild(sidebar);
 
-    const nextLabel = new BS.UILabel();
-    nextLabel.SetProperty(BS.PN.text, 'NEXT');
-    nextLabel.style.fontSize        = '11px';
-    nextLabel.style.color           = '#9ca3af';
-    nextLabel.style.backgroundColor = 'rgba(0,0,0,0)';
-    nextLabel.style.marginBottom    = '4px';
+    const nextLabel = makeLabel(BS, 'NEXT', { fontSize: 11, color: '#9ca3af' });
+    nextLabel.style.height       = `${NEXT_LABEL_HEIGHT}px`;
+    nextLabel.style.marginBottom = '4px';
     sidebar.AppendChild(nextLabel);
 
-    const nextPreviewEl = new BS.UIVisualElement();
-    nextPreviewEl.style.display         = 'flex';
-    nextPreviewEl.style.flexDirection   = 'column';
-    nextPreviewEl.style.width           = `${NEXT_SIZE * (cellSize + GAP)}px`;
-    nextPreviewEl.style.backgroundColor = '#0b0d14';
-    nextPreviewEl.style.marginBottom    = '10px';
-    sidebar.AppendChild(nextPreviewEl);
+    // Explicit height, not just left to size from its child grid — flex
+    // items shrink under space pressure by default, and this was the
+    // element observed absorbing that squeeze in-world (see the height
+    // budget comment above `boardWidth` for why the budget can be tight).
+    const nextPreviewWrapper = new BS.UIVisualElement();
+    nextPreviewWrapper.style.height          = `${NEXT_SIZE * (cellSize + gap)}px`;
+    nextPreviewWrapper.style.backgroundColor = '#0b0d14';
+    nextPreviewWrapper.style.marginBottom    = '10px';
+    sidebar.AppendChild(nextPreviewWrapper);
 
-    const nextCells = [];
-    for (let r = 0; r < NEXT_SIZE; r++) {
-      const rowEl = new BS.UIVisualElement();
-      rowEl.style.display       = 'flex';
-      rowEl.style.flexDirection = 'row';
-      nextPreviewEl.AppendChild(rowEl);
-
-      const rowCells = [];
-      for (let c = 0; c < NEXT_SIZE; c++) {
-        const cell = new BS.UIVisualElement();
-        cell.style.width           = `${cellSize}px`;
-        cell.style.height          = `${cellSize}px`;
-        cell.style.backgroundColor = EMPTY_COLOR;
-        cell.style.marginRight     = `${GAP}px`;
-        cell.style.marginBottom    = `${GAP}px`;
-        rowEl.AppendChild(cell);
-        rowCells.push(cell);
-      }
-      nextCells.push(rowCells);
-    }
+    const { el: nextGridEl, cells: nextCells } = makeGrid(BS, {
+      rows: NEXT_SIZE, cols: NEXT_SIZE, cellSize, gap, getColor: () => EMPTY_COLOR,
+    });
+    nextPreviewWrapper.AppendChild(nextGridEl);
 
     // No explicit width on buttons — flex-stretch fills the sidebar column
     // correctly; UIButton's content-box sizing means an explicit width here
     // would overflow (see docs/setup-bantervr-ui.md's UIButton quirk).
-    function makeSidebarButton(label, action) {
-      const btn = new BS.UIButton();
-      btn.SetProperty(BS.PN.text, label);
-      btn.style.fontSize      = '11px';
-      btn.style.color         = '#ffffff';
-      btn.style.height        = '30px';
-      btn.style.marginBottom  = '6px';
-      btn.OnClick(() => onAction(action));
+    function addSidebarButton(label, action) {
+      const btn = makeButton(BS, label, () => onAction(action), { fontSize: 11 });
+      btn.style.height       = `${BUTTON_HEIGHT}px`;
+      btn.style.marginBottom = '6px';
       sidebar.AppendChild(btn);
       return btn;
     }
-    makeSidebarButton('← Left',   'left');
-    makeSidebarButton('→ Right',  'right');
-    makeSidebarButton('⟲ Rotate', 'rotateLeft');
-    makeSidebarButton('⟳ Rotate', 'rotateRight');
-    makeSidebarButton('⬇ Drop',   'harddrop');
-    makeSidebarButton('↺ Restart', 'restart');
+    addSidebarButton('← Left',    'left');
+    addSidebarButton('→ Right',   'right');
+    addSidebarButton('↺ Rotate', 'rotateLeft');
+    addSidebarButton('↻ Rotate', 'rotateRight');
+    addSidebarButton('⬇ Drop',   'harddrop');
+    addSidebarButton('Restart',  'restart');
 
-    const statusLabel = new BS.UILabel();
-    statusLabel.style.fontSize        = '13px';
-    statusLabel.style.color           = '#fbbf24';
-    statusLabel.style.backgroundColor = 'rgba(0,0,0,0)';
-    statusLabel.style.marginBottom    = '4px';
+    // Explicit height (not just left to intrinsic content sizing) — this
+    // label starts empty and only gets text later via updateLabels(), and a
+    // panel's resolution is fixed at construction time. If the label's real
+    // layout height differs between "empty" and "has text", the panel was
+    // sized for the wrong one and everything else gets squeezed to
+    // compensate once GAME OVER/PAUSED text appears. A fixed height makes
+    // its footprint constant regardless of content.
+    const statusLabel = makeLabel(BS, '', { fontSize: 13, color: '#fbbf24' });
+    statusLabel.style.height       = `${STATUS_HEIGHT}px`;
+    statusLabel.style.marginBottom = '4px';
     panel.root.AppendChild(statusLabel);
 
-    const hintLabel = new BS.UILabel();
-    hintLabel.SetProperty(BS.PN.text, '←→ move  ↓ soft-drop  ↑ rotate  — or use the buttons →');
-    hintLabel.style.fontSize        = '9px';
-    hintLabel.style.color           = '#6b7280';
-    hintLabel.style.backgroundColor = 'rgba(0,0,0,0)';
+    const hintLabel = makeLabel(BS, '←→ move  ↓ soft-drop  ↑ rotate  — or use the buttons →', { fontSize: 9, color: '#6b7280' });
+    hintLabel.style.height = `${HINT_HEIGHT}px`;
     panel.root.AppendChild(hintLabel);
 
     // ─── Game state ────────────────────────────────────────────────────────
@@ -454,5 +483,11 @@ export const Tetris = {
     requestAnimationFrame(loop);
 
     return obj;
-  }),
+  }, { skipGenericInject: true }),
+  // skipGenericInject: BlockDrop has its own dedicated in-world script
+  // (meta-preview-altspace-blockdrop-inject.js) with its own spawn/despawn
+  // lifecycle. Without this, selecting this story would ALSO make the
+  // generic meta-preview-altspace-inject.js build a second, non-interactive
+  // static snapshot alongside the real, playable one — confirmed live
+  // in-world (two panels, one active, one not). See story.js.
 };

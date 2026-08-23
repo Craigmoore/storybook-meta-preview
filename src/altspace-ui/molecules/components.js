@@ -1,6 +1,36 @@
 // Molecule constructor functions — return UI elements, not full panels.
 // Import these in organism stories to compose molecules cleanly.
 
+import { makeBlock } from '../atoms/components.js';
+
+// A rows×cols grid of Block atoms. getColor(row, col) decides each cell's
+// colour at build time; the returned `cells` 2D array lets the caller keep
+// mutating individual cell colours afterwards (e.g. BlockDrop's redraw loop).
+export function makeGrid(BS, { rows, cols, cellSize, gap = 1, getColor }) {
+  const gridEl = new BS.UIVisualElement();
+  gridEl.style.display       = 'flex';
+  gridEl.style.flexDirection = 'column';
+
+  const cells = [];
+  for (let r = 0; r < rows; r++) {
+    const rowEl = new BS.UIVisualElement();
+    rowEl.style.display       = 'flex';
+    rowEl.style.flexDirection = 'row';
+
+    const rowCells = [];
+    for (let c = 0; c < cols; c++) {
+      const cell = makeBlock(BS, { size: cellSize, color: getColor(r, c) });
+      cell.style.marginRight  = `${gap}px`;
+      cell.style.marginBottom = `${gap}px`;
+      rowEl.AppendChild(cell);
+      rowCells.push(cell);
+    }
+    gridEl.AppendChild(rowEl);
+    cells.push(rowCells);
+  }
+  return { el: gridEl, cells };
+}
+
 export function makeStatusBadge(BS, status, theme) {
   const badge = new BS.UIVisualElement();
   badge.style.display         = 'flex';

@@ -25,6 +25,15 @@ const useHttps = existsSync(certPath) && existsSync(keyPath);
 // Shared client set — both HTTP and HTTPS WebSocket servers write here
 const clients = new Set();
 
+const BROADCAST_ROLES = new Set(['meta-preview', 'banter-inject', 'altspace-inject', 'tui-preview', 'sdf2d-preview', 'sdf3d-preview', 'bantervr-sdf3d-inject']);
+
+// Last story-rendered payload, resent to any broadcast-role client that
+// registers afterwards — so a client connecting/reconnecting after the fact
+// (e.g. a fresh Altspace world load, or a reconnect following a network
+// blip) sees the current story immediately, instead of a blank/absent state
+// until Storybook happens to re-render something.
+let lastStoryRendered = null;
+
 function handleConnection(ws) {
   ws.role = 'unknown';
   clients.add(ws);
@@ -36,16 +45,17 @@ function handleConnection(ws) {
 
     if (msg.type === 'register') {
       ws.role = msg.role;
+      if (BROADCAST_ROLES.has(ws.role) && lastStoryRendered && ws.readyState === WebSocket.OPEN) {
+        ws.send(lastStoryRendered);
+      }
       return;
     }
 
     if (msg.type === 'story-rendered' && ws.role === 'storybook-channel') {
       const payload = JSON.stringify(msg);
+      lastStoryRendered = payload;
       for (const client of clients) {
-        if (
-          (client.role === 'meta-preview' || client.role === 'banter-inject' || client.role === 'altspace-inject' || client.role === 'tui-preview' || client.role === 'sdf2d-preview' || client.role === 'sdf3d-preview' || client.role === 'bantervr-sdf3d-inject')
-          && client.readyState === WebSocket.OPEN
-        ) {
+        if (BROADCAST_ROLES.has(client.role) && client.readyState === WebSocket.OPEN) {
           client.send(payload);
         }
       }

@@ -22,7 +22,13 @@
     const wsUrl   = `${wsProto}//${srcUrl.host}`;
 
     function parseVec3(attr, dx, dy, dz) {
-      const parts = (tag.getAttribute(attr) || '').trim().split(/\s+/).map(Number);
+      const raw = (tag.getAttribute(attr) || '').trim();
+      // Number('') is 0, not NaN — without this early return, a MISSING
+      // attribute would silently resolve x to 0 (isNaN(0) is false) while
+      // y/z correctly fell back to their defaults, producing a lopsided
+      // vector like (0, 1, 1) instead of the intended (dx, dy, dz).
+      if (!raw) return { x: dx, y: dy, z: dz };
+      const parts = raw.split(/\s+/).map(Number);
       return {
         x: isNaN(parts[0]) ? dx : parts[0],
         y: isNaN(parts[1]) ? dy : parts[1],

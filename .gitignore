@@ -18,3 +18,4 @@ coverage/
 .claude/
 storybook-static/
 certs/
+*:Zone.Identifier

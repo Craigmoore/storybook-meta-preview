@@ -4,7 +4,7 @@ import { makeStatusBadge, makePlayerRow, makeToggleRow, makeSliderRow } from '..
 export default { title: 'Altspace-UI/Organisms/GameLobby' };
 
 const range  = (min, max, step = 1) => ({ control: { type: 'range', min, max, step } });
-const select = (...options)          => ({ control: { type: 'select', options } });
+const select = (...options)          => ({ control: { type: 'select' }, options });
 
 const PLAYER_NAMES = ['Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel'];
 
