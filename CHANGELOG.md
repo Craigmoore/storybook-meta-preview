@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.18.0] - 2026-08-23
 
 ### Added
 - `altspace-3d` setup — parallel fork of `bantervr-3d` targeting the `Altspace` branch of BanterSDK, same rationale as `altspace-ui`. Confirmed the 3D geometry/material component API (`BanterBox`, `BanterSphere`, `BanterCylinder`, `BanterCone`, `BanterTorus`, `BanterTorusKnot`, `BanterMaterial`) is byte-for-byte unchanged on that branch by diffing the relevant C# files directly against `main` (not just checking the classes exist), so this is a straight rebrand-only fork — own stories, mock, meta-preview, inject script, standalone demo. Ports: Storybook 6017, relay 3344. Stories: `Altspace-3D / Atoms / Primitives`, `Altspace-3D / Molecules / Volumes`, `Altspace-3D / Molecules / Fractals` — same set as `bantervr-3d`. `src/storybook-channel.js` got a new `window.__metaPreviewAltspace3D` branch sending `altspace3DData`, and the inject script (`public/meta-preview-altspace-inject-3d.js`) registers with the existing `altspace-inject` relay role (shared with `altspace-ui`'s inject scripts — setups are isolated by relay port, not role name, same as `bantervr-ui`/`bantervr-3d` sharing `banter-inject`), so no relay changes were needed. Verified end-to-end with a real WebSocket client registered against the running relay: selecting a story produces `altspace3DData` (not the generic `html` field), matching the shape `meta-preview-altspace-inject-3d.js` expects. Not yet confirmed live in Altspace itself — see `docs/setup-altspace-3d.md`
