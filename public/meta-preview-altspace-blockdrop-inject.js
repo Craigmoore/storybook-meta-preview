@@ -109,9 +109,10 @@
 
   // ─── Piece definitions — identical to the Storybook story ────────────────
   // Colour-to-shape pairing deliberately does NOT match the well-known
-  // Tetris Guideline assignment (I=cyan, O=yellow, T=purple, S=green,
-  // Z=red, J=blue, L=orange) — every shape below defaults to a different
-  // one of the same seven hues, to stay clear of that trade dress. Every
+  // falling-block genre's official shape-to-colour assignment (I=cyan,
+  // O=yellow, T=purple, S=green, Z=red, J=blue, L=orange) — every shape
+  // below defaults to a different one of the same seven hues, to stay
+  // clear of that trade dress. Every
   // colour (plus emptycolor above) is overridable via a script-tag
   // attribute — the in-world equivalent of the Storybook story's colour
   // controls, since there's no Storybook UI available in-world.

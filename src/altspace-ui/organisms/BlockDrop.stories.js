@@ -57,10 +57,11 @@ for (const [type, grid0] of Object.entries(PIECE_GRIDS)) {
 
 const LINE_SCORES = [0, 100, 300, 500, 800];
 
-// Colour-to-shape defaults deliberately do NOT match the well-known Tetris
-// Guideline assignment (I=cyan, O=yellow, T=purple, S=green, Z=red, J=blue,
-// L=orange) — every shape below defaults to a different one of the same
-// seven hues, to stay clear of that trade dress. All of them, plus the
+// Colour-to-shape defaults deliberately do NOT match the well-known
+// falling-block genre's official shape-to-colour assignment (I=cyan,
+// O=yellow, T=purple, S=green, Z=red, J=blue, L=orange) — every shape below
+// defaults to a different one of the same seven hues, to stay clear of that
+// trade dress. All of them, plus the
 // empty-cell colour, are exposed as controls so the whole palette is
 // genuinely configurable, not just hard-coded past this default.
 const DEFAULT_COLORS = {
