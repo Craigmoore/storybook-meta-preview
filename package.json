@@ -1,6 +1,6 @@
 {
   "name": "storybook-meta-preview",
-  "version": "0.2.0",
+  "version": "0.18.0",
   "type": "module",
   "scripts": {
     "storybook:html": "storybook dev -c .storybook-html -p 6006 --host 0.0.0.0",

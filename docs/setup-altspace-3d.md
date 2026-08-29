@@ -99,7 +99,7 @@ This is an approximation, not a fully general 3D transform: position/scale compo
 
 Verified with a harness that runs the real file end-to-end (mocked `BS`/`WebSocket`) against the actual `FractalTree` wire payload captured live: confirms `FractalTree` gets `tag position + its own offset`, its `branch` child gets `FractalTree's full position + its own offset` (not just its own raw offset), and neither object has a `parent` field set at all.
 
-Confirmed live in Altspace after round 2: `Primitives` and `Volumes` positioned correctly. `Fractals` not yet re-confirmed after this fix — flag here once it has been.
+Confirmed live in Altspace after this fix — `Primitives`, `Volumes`, and `Fractals` (`FractalTree`/`SierpinskiTetrahedron`/`MengerSponge`) all position correctly, including `Fractals`' nested children.
 
 ---
 

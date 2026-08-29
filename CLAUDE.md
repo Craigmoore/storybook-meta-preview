@@ -36,7 +36,7 @@ Everything is organised into named setups. There is no "default" setup.
 | Storybook port | 6006, 6007, 6008… |
 | Relay port | 3333, 3334, 3335… |
 
-Current setups (see `setups.js`):
+`setups.js` is the source of truth for the full list of current setups (12 and counting — html, threejs-2d, threejs-3d, audio, openbrush, bantervr-ui, bantervr-3d, tui, sdf2d, sdf3d, altspace-ui, altspace-3d). Example entry:
 - `html` — `@storybook/html-webpack5`, port 6006, relay 3333
 
 Each setup's `.storybook-[name]/preview.js` is a one-liner:
