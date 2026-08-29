@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.18.1] - 2026-08-29
 
 ### Fixed
 - `CHANGELOG.md` — the `## Unreleased` heading went missing after the v0.18.0 release (the release tool's `## Unreleased` → `## [x.y.z]` swap doesn't add a fresh one back); re-added it
