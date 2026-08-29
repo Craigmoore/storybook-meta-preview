@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Fixed
+- `CHANGELOG.md` — the `## Unreleased` heading went missing after the v0.18.0 release (the release tool's `## Unreleased` → `## [x.y.z]` swap doesn't add a fresh one back); re-added it
+- `package.json` — `"version"` was stuck at a stale `"0.2.0"`, unrelated to actual release history (the release tool reads git tags, never writes package.json); synced to match the latest release
+- `docs/setup-altspace-3d.md` — a line still said `Fractals` hadn't been re-confirmed live after the parent-transform fix, though it was, later in the same session; updated to reflect all three story files (Primitives/Volumes/Fractals) confirmed working
+- `CLAUDE.md` — "Current setups (see `setups.js`):" was followed by a single example entry that read as if it were the complete list; reworded to state the actual count and name them, framing the example as an example
+
 ## [0.18.0] - 2026-08-23
 
 ### Added
